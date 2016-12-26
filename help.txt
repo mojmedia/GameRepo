@@ -10,3 +10,8 @@
   270  git status 
   271  git commit -m "aliasghar.txt"
   272  git push -u origin developer_aliasghar 
+
+  For get All changed and new files from remote repo to local repo:
+	
+	>>git checout master
+	>>git pull
