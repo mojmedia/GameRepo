@@ -1,0 +1,19 @@
+﻿261  git config --global user.name "username"
+262  git config --global user.email "user@mail.com"
+263  git clone git@github.com:mojmedia/GameRepo.git
+// گرفتن فایل های موجود در ریپوزیتوری.
+توجه داشته باشید که در بالا ریپوزیتوری خودتان را کلون کنید.
+264  cd GameRepo/
+// وارد پوشه ساخته شده میشویم.توجه داشته باشید در صورتی که ریپو شما پوشه نداشت نیازی به این دستور نمیباشد.
+265  git remote add origin git@github.com:mojmedia/GameRepo.git
+// ست کردن ریپوزیتوری موجود
+266  git fetch 
+// گرفتن اخرین تفیرات نظیر شاخه ها و...
+267  git checkout developer_aliasghar 
+// تغییر شاخه
+توجه داشته باشید که به صورت پیش فرض در شاخه مستر میباشید.
+268  git status 
+269  git add *
+270  git status 
+271  git commit -m "aliasghar.txt"
+272  git push -u origin developer_aliasghar 
