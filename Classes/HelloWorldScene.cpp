@@ -1,3 +1,4 @@
+﻿//بسم االله الرحمن الرحیم
 #include "HelloWorldScene.h"
 
 USING_NS_CC;
@@ -27,64 +28,144 @@ bool HelloWorld::init()
         return false;
     }
     
-    CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+    visibleSize = CCDirector::sharedDirector()->getVisibleSize();
     CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
     /////////////////////////////
     // 2. add a menu item with "X" image, which is clicked to quit the program
     //    you may modify it.
 
-    // add a "close" icon to exit the progress. it's an autorelease object
-    CCMenuItemImage *pCloseItem = CCMenuItemImage::create(
-                                        "CloseNormal.png",
-                                        "CloseSelected.png",
-                                        this,
-                                        menu_selector(HelloWorld::menuCloseCallback));
-    
-	pCloseItem->setPosition(ccp(origin.x + visibleSize.width - pCloseItem->getContentSize().width/2 ,
-                                origin.y + pCloseItem->getContentSize().height/2));
+	//...................background............
+	CCSprite*	bg = CCSprite::create("bookGame_Bg.png");
+	bg->setPosition(ccp(visibleSize.width *	0.5, visibleSize.height	* 0.5));
+	this->addChild(bg, -1);
 
-    // create menu, it's an autorelease object
-    CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-    pMenu->setPosition(CCPointZero);
-    this->addChild(pMenu, 1);
+	//.................hero....................
+	hero = CCSprite::create("bookGame_tinyBazooka.png");
+	hero->setPosition(ccp(visibleSize.width	*	0.25, visibleSize.height	*
+		0.5));
+	this->addChild(hero, 5);
 
-    /////////////////////////////
-    // 3. add your codes below...
+	//...............scheduleUpdate.............
+	this->scheduleUpdate();
 
-    // add a label shows "Hello World"
-    // create and initialize a label
-    
-    CCLabelTTF* pLabel = CCLabelTTF::create("Hello World", "Arial", 24);
-    
-    // position the label on the center of the screen
-    pLabel->setPosition(ccp(origin.x + visibleSize.width/2,
-                            origin.y + visibleSize.height - pLabel->getContentSize().height));
+	//................set touch layer...........
+	this->setTouchEnabled(true);
+	//................set accelerometer.........
+	this->setAccelerometerEnabled(true);
 
-    // add the label as a child to this layer
-    this->addChild(pLabel, 1);
-
-    // add "HelloWorld" splash screen"
-    CCSprite* pSprite = CCSprite::create("HelloWorld.png");
-
-    // position the sprite on the center of the screen
-    pSprite->setPosition(ccp(visibleSize.width/2 + origin.x, visibleSize.height/2 + origin.y));
-
-    // add the sprite as a child to this layer
-    this->addChild(pSprite, 0);
-    
+	//..................arrowkey................
+	CCMenuItemImage	*arrowleft = CCMenuItemImage::create("l.png",
+		"l-1.png", this, menu_selector(HelloWorld::buttonControlleft));
+	arrowleft->setPosition(ccp(origin.x + 40,
+		origin.y+40));
+	CCMenuItemImage	*arrowdown = CCMenuItemImage::create("b.png",
+		"b-1.png", this, menu_selector(HelloWorld::buttonControldown));
+	arrowdown->setPosition(ccp(origin.x + 110,
+		origin.y + 40));
+	CCMenuItemImage	*arrowtop = CCMenuItemImage::create("t.png",
+		"t-1.png", this, menu_selector(HelloWorld::buttonControltop));
+	arrowtop->setPosition(ccp(origin.x + 110,
+		origin.y + 110));
+	CCMenuItemImage	*arrowright = CCMenuItemImage::create("r.png",
+		"r-1.png", this, menu_selector(HelloWorld::buttonControlright));
+	arrowright->setPosition(ccp(origin.x + 180,
+		origin.y + 40));
+	CCMenuItemImage	*gun = CCMenuItemImage::create("firing_gun.png",
+		"firing_gun1.png", this, menu_selector(HelloWorld::buttongun));
+	gun->setPosition(ccp(visibleSize.width-(gun->getContentSize().width/2 +10),
+		gun->getContentSize().height / 2+5));
+	CCMenu*	pMenu = CCMenu::create(arrowleft,arrowdown,arrowtop,arrowright,gun,NULL);
+	pMenu->setPosition(CCPointZero);
+	this->addChild(pMenu, 1);
     return true;
 }
-
-
-void HelloWorld::menuCloseCallback(CCObject* pSender)
+void HelloWorld::update(float dt)
 {
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_WINRT) || (CC_TARGET_PLATFORM == CC_PLATFORM_WP8)
-	CCMessageBox("You pressed the close button. Windows Store Apps do not implement a close button.","Alert");
-#else
-    CCDirector::sharedDirector()->end();
-#if (CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
-    exit(0);
-#endif
-#endif
+	//CCLog("update");
+	/*CCPoint	p = hero->getPosition();
+	hero->setPosition(ccp(p.x + 5, p.y));
+	if ((hero->getPositionX() - hero->getContentSize().width / 2)>
+		visibleSize.width)
+	{
+		hero->setPosition(ccp(0.0 - hero->getContentSize().width / 2, hero->getPositionY()));
+	}*/
+	//.............accelometer............
+	/*float maxY = visibleSize.height - hero->getContentSize().height / 2;
+	float minY = hero->getContentSize().height / 2;
+	float distStep = (distFraction * dt);
+	float newY = hero->getPosition().y + distStep;
+	newY = MIN(MAX(newY, minY), maxY);
+	hero->setPosition(ccp(hero->getPosition().x, newY));*/
 }
+
+void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
+{
+	//.......................defindetouchposition............
+	/*CCTouch *touch = (CCTouch*)pTouches->anyObject();
+	CCPoint	location = touch->getLocationInView();
+	location = CCDirector::sharedDirector()->convertToGL(location);*/
+	//CCLog("location:	xpos:%f	,	ypos:%f", location.x, location.y);
+	// .................moveto touch position.................
+	/*CCMoveTo	*actionMove = CCMoveTo::create(1, location);
+	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
+	hero->runAction(easeInOut);*/
+	//...............multi movement...................
+	/*CCPoint	initPos = hero->getPosition();
+	CCMoveTo* actionMove = CCMoveTo::create(1, location);
+	CCRotateBy* rotateBy = CCRotateBy::create(2.0, 180);
+	CCTintTo* tintTo = CCTintTo::create(1.0, 255, 125, 125);
+	CCDelayTime* delay = CCDelayTime::create(1.0);
+	CCMoveTo* moveToInit = CCMoveTo::create(1, initPos);
+	CCTintTo* tintTo1 = CCTintTo::create(1.0, 0, 0, 0);
+	CCSequence* sequence = CCSequence::create(actionMove, rotateBy, tintTo,delay, moveToInit,tintTo1, NULL);
+	hero->runAction(sequence);*/
+}
+void HelloWorld::ccTouchesMoved(CCSet* pTouches, CCEvent* event)
+{
+	CCLog("move");
+}
+void HelloWorld::ccTouchesEnded(CCSet* pTouches, CCEvent* event)
+{
+	CCLog("ended");
+}
+void HelloWorld::didAccelerate(CCAcceleration* pAccelerationValue)
+{
+	//distFraction = visibleSize.height* pAccelerationValue->x;
+}
+void HelloWorld::buttonControlleft(CCObject *pSender)
+{
+	CCMoveBy *actionMove = CCMoveBy::create(1.0,cocos2d::CCPoint(-20,0));
+	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
+	hero->runAction(easeInOut);
+}
+void HelloWorld::buttonControldown(CCObject *pSender)
+{
+	CCMoveBy *actionMove = CCMoveBy::create(1.0, cocos2d::CCPoint(0, -20));
+	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
+	hero->runAction(easeInOut);
+}
+void HelloWorld::buttonControlright(CCObject *pSender)
+{
+	CCMoveBy *actionMove = CCMoveBy::create(1.0, cocos2d::CCPoint(20, 0));
+	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
+	hero->runAction(easeInOut);
+}
+void HelloWorld::buttonControltop(CCObject *pSender)
+{
+	CCMoveBy *actionMove = CCMoveBy::create(1.0, cocos2d::CCPoint(0, 20));
+	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
+	hero->runAction(easeInOut);
+}
+void HelloWorld::buttongun(CCObject *pSender)
+{
+	CCSprite* test = CCSprite::create("bookGame_rocket.png");
+	test->setPosition(ccp(hero->getPosition().x + hero->getContentSize().width / 2, hero->getPosition().y - 7));
+	this->addChild(test);
+	CCMoveTo *actionMove = CCMoveTo::create(1.0, cocos2d::CCPoint(hero->getPosition().x + visibleSize.width, hero->getPosition().y - 7));
+	CCEaseSineIn *easeInOut = CCEaseSineIn::create(actionMove);
+	test->runAction(easeInOut);
+	
+}
+
+
