@@ -2,6 +2,8 @@
 #define __HELLOWORLD_SCENE_H__
 
 #include "cocos2d.h"
+#include "Enemy.h"
+#include "GameplayLayer.h"
 USING_NS_CC;
 class HelloWorld : public cocos2d::CCLayer
 {
@@ -9,6 +11,8 @@ public:
 	CCSprite*	hero;
 	CCSize visibleSize;
 	float distFraction;
+	//Enemy*	enemy;
+	GameplayLayer* gameplayLayer;
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone
     virtual bool init();  
 
@@ -21,11 +25,12 @@ public:
 
 	// ...................update function...........
 	virtual void update(float dt);
+	virtual void spawnEnemy(float dt);
 	//......................function arrow ..........
-	void buttonControlleft(CCObject *pSender);
+	/*void buttonControlleft(CCObject *pSender);
 	void buttonControldown(CCObject *pSender);
 	void buttonControltop(CCObject *pSender);
-	void buttonControlright(CCObject *pSender);
+	void buttonControlright(CCObject *pSender);*/
 	void buttongun(CCObject *pSender);
 
 	//....................touch............
