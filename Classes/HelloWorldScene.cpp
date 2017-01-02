@@ -1,5 +1,6 @@
 ﻿//بسم االله الرحمن الرحیم
 #include "HelloWorldScene.h"
+#include "Projectile.h"
 
 
 USING_NS_CC;
@@ -56,7 +57,10 @@ bool HelloWorld::init()
 	this->setTouchEnabled(true);
 	//................set accelerometer.........
 	this->setAccelerometerEnabled(true);
-
+	//.............hero contorls................
+	leftButton = CCRectMake(0, 0, visibleSize.width / 2, visibleSize.height);
+	rightButton = CCRectMake(visibleSize.width / 2, 0, visibleSize.width / 2,
+		visibleSize.height);
 	//..................arrowkey................
 	/*CCMenuItemImage	*arrowleft = CCMenuItemImage::create("l.png",
 		"l-1.png", this, menu_selector(HelloWorld::buttonControlleft));
@@ -84,6 +88,10 @@ bool HelloWorld::init()
 	//.................enemy...................
 	/*enemy = Enemy::createEnemy();
 	this->addChild(enemy);*/
+	//....................gravity...........
+	gravity = ccp(0, -5);
+	jumping = false;
+	jumpTimer = 0;
     return true;
 }
 void HelloWorld::update(float dt)
@@ -99,10 +107,35 @@ void HelloWorld::update(float dt)
 		hero->setPosition(ccp(0.0 - hero->getContentSize().width / 2, hero->getPositionY()));
 	}*/
 	//.............accelometer............
-	float maxY = visibleSize.height - hero->getContentSize().height / 2;
+	/*float maxY = visibleSize.height - hero->getContentSize().height / 2;
 	float minY = hero->getContentSize().height / 2;
 	float distStep = (distFraction * dt);
 	float newY = hero->getPosition().y + distStep;
+	newY = MIN(MAX(newY, minY), maxY);
+	hero->setPosition(ccp(hero->getPosition().x, newY));*/
+	//....................jumpping................
+	if (jumping)
+	{
+		jumpTimer = 10;
+		jumping = false;
+	}
+	if (jumpTimer>0)
+	{
+		jumpTimer--;
+		CCPoint	p = hero->getPosition();
+		CCPoint	mP = ccpAdd(p, ccp(0, 7));
+		hero->setPosition(mP);
+	}
+	else
+	{
+		jumpTimer = 0;
+		CCPoint	p = hero->getPosition();
+		CCPoint	pM = ccpAdd(p, gravity);
+		hero->setPosition(pM);
+	}
+	float	maxY = visibleSize.height - hero->getContentSize().height / 2;
+	float	minY = hero->getContentSize().height / 2;
+	float	newY = hero->getPosition().y;
 	newY = MIN(MAX(newY, minY), maxY);
 	hero->setPosition(ccp(hero->getPosition().x, newY));
 }
@@ -123,9 +156,9 @@ void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 	location = CCDirector::sharedDirector()->convertToGL(location);
 	//CCLog("location:	xpos:%f	,	ypos:%f", location.x, location.y);
 	// .................moveto touch position.................
-	CCMoveTo	*actionMove = CCMoveTo::create(1, location);
+	/*CCMoveTo	*actionMove = CCMoveTo::create(1, location);
 	CCEaseSineInOut	*easeInOut = CCEaseSineInOut::create(actionMove);
-	hero->runAction(easeInOut);
+	hero->runAction(easeInOut);*/
 	//...............multi movement...................
 	/*CCPoint	initPos = hero->getPosition();
 	CCMoveTo* actionMove = CCMoveTo::create(1, location);
@@ -136,6 +169,14 @@ void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 	CCTintTo* tintTo1 = CCTintTo::create(1.0, 0, 0, 0);
 	CCSequence* sequence = CCSequence::create(actionMove, rotateBy, tintTo,delay, moveToInit,tintTo1, NULL);
 	hero->runAction(sequence);*/
+	if (rightButton.containsPoint(location))
+	{
+		fireRocket();
+	}
+	if (leftButton.containsPoint(location))
+	{
+		jumping = true;
+	}
 }
 void HelloWorld::ccTouchesMoved(CCSet* pTouches, CCEvent* event)
 {
@@ -179,16 +220,26 @@ void HelloWorld::buttonControltop(CCObject *pSender)
 		hero->runAction(easeInOut);
 	}
 	
-}*/
-void HelloWorld::buttongun(CCObject *pSender)
+//}*/
+//void HelloWorld::buttongun(CCObject *pSender)
+//{
+//	CCSprite* test = CCSprite::create("bookGame_rocket.png");
+//	test->setPosition(ccp(hero->getPosition().x + hero->getContentSize().width / 2, hero->getPosition().y - 7));
+//	this->addChild(test);
+//	//CCMoveTo *actionMove = CCMoveTo::create(1.0, cocos2d::CCPoint(hero->getPosition().x + visibleSize.width, hero->getPosition().y - 7));
+//	//CCEaseSineIn *easeInOut = CCEaseSineIn::create(actionMove);
+//	//test->runAction(easeInOut);
+//	
+//}
+//....................fire rocket..........
+void	HelloWorld::fireRocket()
 {
-	CCSprite* test = CCSprite::create("bookGame_rocket.png");
-	test->setPosition(ccp(hero->getPosition().x + hero->getContentSize().width / 2, hero->getPosition().y - 7));
-	this->addChild(test);
-	//CCMoveTo *actionMove = CCMoveTo::create(1.0, cocos2d::CCPoint(hero->getPosition().x + visibleSize.width, hero->getPosition().y - 7));
-	//CCEaseSineIn *easeInOut = CCEaseSineIn::create(actionMove);
-	//test->runAction(easeInOut);
-	
+	CCPoint	p = hero->getPosition();
+	p.x = p.x + hero->getContentSize().width / 2;
+	p.y = p.y - hero->getContentSize().height	*	0.05;
+	Projectile*	rocket = Projectile::createProjectile(p, 2);
+	gameplayLayer->addChild(rocket);
+	gameplayLayer->getPlayerBulletsArray()->addObject(rocket);
 }
 
 

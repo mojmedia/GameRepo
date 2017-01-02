@@ -22,16 +22,22 @@ public:
     
     // implement the "static node()" method manually
     CREATE_FUNC(HelloWorld);
-
+	//......................gravity...............
+	CCPoint	gravity;
+	int	jumpTimer;
+	bool	jumping;
 	// ...................update function...........
 	virtual void update(float dt);
 	virtual void spawnEnemy(float dt);
+	//..............hero controls...................
+	void	fireRocket();
+	CCRect	leftButton, rightButton;
 	//......................function arrow ..........
 	/*void buttonControlleft(CCObject *pSender);
 	void buttonControldown(CCObject *pSender);
 	void buttonControltop(CCObject *pSender);
 	void buttonControlright(CCObject *pSender);*/
-	void buttongun(CCObject *pSender);
+	//void buttongun(CCObject *pSender);
 
 	//....................touch............
 	virtual	void ccTouchesBegan(CCSet* pTouches, CCEvent *event);

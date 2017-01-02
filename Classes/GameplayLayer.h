@@ -8,13 +8,17 @@ public:
 	GameplayLayer();
 	~GameplayLayer();
 	void	update();
-	CCArray*	getEnemiesArray();
-	CCArray*	enemyBulletsToBeDeleted;
-	CCArray*	getEnemyBulletsArray();
+	CCArray *getEnemiesArray();
+	CCArray *enemyBulletsToBeDeleted;
+	CCArray *getEnemyBulletsArray();
+	CCArray *getPlayerBulletsArray();
+	CCArray *palyerBulletsToBeDeleted;
+	
 private:	
 	CCSize	visibleSize;	
 	CCArray*	enemies;//store all the enemy that we create and keep track	of them
 	CCArray*	enemiesToBeDeleted;
 	CCArray*	enemyBullets;
+	CCArray*    playerBullets;
 };
 #endif	/*	defined(__wp8Game__GameplayLayer__)	*/

@@ -7,6 +7,9 @@ GameplayLayer::GameplayLayer()
 	enemyBullets = new	CCArray();
 	enemyBulletsToBeDeleted = new	CCArray();
 	enemiesToBeDeleted = new	CCArray();
+	palyerBulletsToBeDeleted = new CCArray();
+	playerBullets = new	CCArray();
+
 
 }
 GameplayLayer::~GameplayLayer()
@@ -59,7 +62,29 @@ void	GameplayLayer::update()
 		enemyBulletsToBeDeleted->removeObject(target);
 		this->removeChild(target, true);
 	}
-		
+	//player	bullets
+	if (playerBullets->count() > 0)
+	{
+		for (int i = 0; i<playerBullets->count(); i++)
+		{
+			Projectile*	p = (Projectile*)playerBullets->objectAtIndex(i);
+			p->update();
+			if (p->getPositionX() >= visibleSize.width)
+			{
+				palyerBulletsToBeDeleted->addObject(p);
+
+			}
+		}
+	}
+	CCObject*	ep = NULL;
+	CCARRAY_FOREACH(palyerBulletsToBeDeleted, ep)
+	{
+		Projectile	*target = (Projectile*)(ep);
+		playerBullets->removeObject(target);
+		palyerBulletsToBeDeleted->removeObject(target);
+		this->removeChild(target, true);
+	}
+	
 
 	
 }
@@ -70,4 +95,8 @@ CCArray* GameplayLayer::getEnemiesArray()
 CCArray*	GameplayLayer::getEnemyBulletsArray()
 {
 	return	enemyBullets;
+}
+CCArray*	GameplayLayer::getPlayerBulletsArray()
+{
+	return	playerBullets;
 }
