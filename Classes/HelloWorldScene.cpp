@@ -1,6 +1,7 @@
 ﻿//بسم االله الرحمن الرحیم
 #include "HelloWorldScene.h"
 #include "Projectile.h"
+#include "GameplayLayer.h"
 
 
 USING_NS_CC;
@@ -92,52 +93,71 @@ bool HelloWorld::init()
 	gravity = ccp(0, -5);
 	jumping = false;
 	jumpTimer = 0;
+	//.....................scoring.............
+	scoreLabel = CCLabelBMFont::create("Score:	0", "PixelFont.fnt");
+	scoreLabel->setPosition(ccp(visibleSize.width	*	0.870, visibleSize.height	*
+		0.9));
+	this->addChild(scoreLabel, 10);
+	scoreLabel->setScale(0.5);
     return true;
 }
 void HelloWorld::update(float dt)
 {
-	//enemy->update();
-	gameplayLayer->update();
-	//CCLog("update");
-	/*CCPoint	p = hero->getPosition();
-	hero->setPosition(ccp(p.x + 5, p.y));
-	if ((hero->getPositionX() - hero->getContentSize().width / 2)>
+	if (!gameplayLayer->gameOver)
+	{
+		//enemy->update();
+		gameplayLayer->update();
+		//CCLog("update");
+		/*CCPoint	p = hero->getPosition();
+		hero->setPosition(ccp(p.x + 5, p.y));
+		if ((hero->getPositionX() - hero->getContentSize().width / 2)>
 		visibleSize.width)
-	{
+		{
 		hero->setPosition(ccp(0.0 - hero->getContentSize().width / 2, hero->getPositionY()));
-	}*/
-	//.............accelometer............
-	/*float maxY = visibleSize.height - hero->getContentSize().height / 2;
-	float minY = hero->getContentSize().height / 2;
-	float distStep = (distFraction * dt);
-	float newY = hero->getPosition().y + distStep;
-	newY = MIN(MAX(newY, minY), maxY);
-	hero->setPosition(ccp(hero->getPosition().x, newY));*/
-	//....................jumpping................
-	if (jumping)
-	{
-		jumpTimer = 10;
-		jumping = false;
-	}
-	if (jumpTimer>0)
-	{
-		jumpTimer--;
-		CCPoint	p = hero->getPosition();
-		CCPoint	mP = ccpAdd(p, ccp(0, 7));
-		hero->setPosition(mP);
+		}*/
+		//.............accelometer............
+		/*float maxY = visibleSize.height - hero->getContentSize().height / 2;
+		float minY = hero->getContentSize().height / 2;
+		float distStep = (distFraction * dt);
+		float newY = hero->getPosition().y + distStep;
+		newY = MIN(MAX(newY, minY), maxY);
+		hero->setPosition(ccp(hero->getPosition().x, newY));*/
+		//....................jumpping................
+		if (jumping)
+		{
+			jumpTimer = 10;
+			jumping = false;
+		}
+		if (jumpTimer>0)
+		{
+			jumpTimer--;
+			CCPoint	p = hero->getPosition();
+			CCPoint	mP = ccpAdd(p, ccp(0, 7));
+			hero->setPosition(mP);
+		}
+		else
+		{
+			jumpTimer = 0;
+			CCPoint	p = hero->getPosition();
+			CCPoint	pM = ccpAdd(p, gravity);
+			hero->setPosition(pM);
+		}
+		float	maxY = visibleSize.height - hero->getContentSize().height / 2;
+		float	minY = hero->getContentSize().height / 2;
+		float	newY = hero->getPosition().y;
+		newY = MIN(MAX(newY, minY), maxY);
+		hero->setPosition(ccp(hero->getPosition().x, newY));
+		//................scoring................
+		char	scoreTxt[100];
+		sprintf(scoreTxt, "Score:	%d", gameplayLayer->score);
+		scoreLabel->setString(scoreTxt);
+
 	}
 	else
 	{
-		jumpTimer = 0;
-		CCPoint	p = hero->getPosition();
-		CCPoint	pM = ccpAdd(p, gravity);
-		hero->setPosition(pM);
+		gameover();
 	}
-	float	maxY = visibleSize.height - hero->getContentSize().height / 2;
-	float	minY = hero->getContentSize().height / 2;
-	float	newY = hero->getPosition().y;
-	newY = MIN(MAX(newY, minY), maxY);
-	hero->setPosition(ccp(hero->getPosition().x, newY));
+	
 }
 void HelloWorld::spawnEnemy(float dt)
 {
@@ -169,14 +189,18 @@ void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 	CCTintTo* tintTo1 = CCTintTo::create(1.0, 0, 0, 0);
 	CCSequence* sequence = CCSequence::create(actionMove, rotateBy, tintTo,delay, moveToInit,tintTo1, NULL);
 	hero->runAction(sequence);*/
-	if (rightButton.containsPoint(location))
+	if (!gameplayLayer->gameOver)
 	{
-		fireRocket();
+		if (rightButton.containsPoint(location))
+		{
+			fireRocket();
+		}
+		if (leftButton.containsPoint(location))
+		{
+			jumping = true;
+		}
 	}
-	if (leftButton.containsPoint(location))
-	{
-		jumping = true;
-	}
+	
 }
 void HelloWorld::ccTouchesMoved(CCSet* pTouches, CCEvent* event)
 {
@@ -241,5 +265,21 @@ void	HelloWorld::fireRocket()
 	gameplayLayer->addChild(rocket);
 	gameplayLayer->getPlayerBulletsArray()->addObject(rocket);
 }
+void HelloWorld::gameover(){
+	if (gameplayLayer->getEnemiesArray()->count() >0)
+	{
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy*	en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
+			en->unscheduleAllSelectors();
+			CCLabelBMFont*	gameOverLabel = CCLabelBMFont::create("GAMEOVER",
+				"PixelFont.fnt");
+			gameOverLabel->setPosition(ccp(visibleSize.width	*	0.5, visibleSize.height
+				*	0.6));
+			this->addChild(gameOverLabel, 10);
+		}
+	}
+}
+
 
 

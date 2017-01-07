@@ -15,6 +15,8 @@ public:
 	CCArray *getPlayerBulletsArray();
 	CCArray *palyerBulletsToBeDeleted;
 	bool checkBoxCollision(CCSprite *box1, CCSprite	*box2);
+	int	score;
+	bool gameOver;
 	
 private:	
 	CCSize	visibleSize;	
