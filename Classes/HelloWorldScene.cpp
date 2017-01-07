@@ -48,7 +48,7 @@ bool HelloWorld::init()
 		0.5));
 	this->addChild(hero, 5);
 	//.....................add GameplayLayer....
-	gameplayLayer = new	GameplayLayer();
+	gameplayLayer = new	GameplayLayer(hero);
 	this->addChild(gameplayLayer);
 	//...............scheduleUpdate.............
 	this->scheduleUpdate();

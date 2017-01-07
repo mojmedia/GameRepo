@@ -5,14 +5,16 @@ using	namespace	cocos2d;
 class	GameplayLayer : public	CCLayer
 {
 public:
-	GameplayLayer();
+	GameplayLayer(CCSprite *_hero);
 	~GameplayLayer();
+	CCSprite*	hero;
 	void	update();
 	CCArray *getEnemiesArray();
 	CCArray *enemyBulletsToBeDeleted;
 	CCArray *getEnemyBulletsArray();
 	CCArray *getPlayerBulletsArray();
 	CCArray *palyerBulletsToBeDeleted;
+	bool checkBoxCollision(CCSprite *box1, CCSprite	*box2);
 	
 private:	
 	CCSize	visibleSize;	

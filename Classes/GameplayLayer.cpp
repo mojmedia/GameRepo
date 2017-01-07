@@ -1,6 +1,6 @@
 #include	"GameplayLayer.h"
 #include	"Enemy.h"
-GameplayLayer::GameplayLayer()
+GameplayLayer::GameplayLayer(CCSprite *_hero)
 {
 	visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 	enemies = new	CCArray();
@@ -9,9 +9,12 @@ GameplayLayer::GameplayLayer()
 	enemiesToBeDeleted = new	CCArray();
 	palyerBulletsToBeDeleted = new CCArray();
 	playerBullets = new	CCArray();
-
-
+	hero = _hero;
 }
+
+
+	
+
 GameplayLayer::~GameplayLayer()
 {
 	
@@ -62,6 +65,19 @@ void	GameplayLayer::update()
 		enemyBulletsToBeDeleted->removeObject(target);
 		this->removeChild(target, true);
 	}
+	//enemy	bullets	and	player
+	if (enemyBullets->count()	>	0)
+	{
+		for (int i = 0; i < enemyBullets->count(); i++)
+		{
+			Projectile*	pr = (Projectile*)enemyBullets->objectAtIndex(i);
+			if (checkBoxCollision(pr, hero))
+			{
+				enemyBulletsToBeDeleted->addObject(pr);
+				return;
+			}
+		}
+	}
 	//player	bullets
 	if (playerBullets->count() > 0)
 	{
@@ -84,6 +100,28 @@ void	GameplayLayer::update()
 		palyerBulletsToBeDeleted->removeObject(target);
 		this->removeChild(target, true);
 	}
+	//player	rocket	and	enemies	collision
+	if (playerBullets->count() >= 0)
+	{
+		for (int i = 0; i<playerBullets->count(); i++)
+		{
+			Projectile*	p = (Projectile*)playerBullets->objectAtIndex(i);
+			if (enemies->count()	>	0)
+			{
+				for (int j = 0; j< enemies->count(); j++)
+				{
+					Enemy*	en = (Enemy*)enemies->objectAtIndex(j);
+					if (checkBoxCollision(p, en))
+					{
+						this->removeChild(p);
+						playerBullets->removeObject(p);
+						enemiesToBeDeleted->addObject(en);
+						return;
+					}
+				}
+			}
+		}
+	}
 	
 
 	
@@ -99,4 +137,17 @@ CCArray*	GameplayLayer::getEnemyBulletsArray()
 CCArray*	GameplayLayer::getPlayerBulletsArray()
 {
 	return	playerBullets;
+}
+bool	GameplayLayer::checkBoxCollision(CCSprite*	box1, CCSprite	*box2)
+{
+	CCRect	box1Rect = box1->boundingBox();
+	CCRect	box2Rect = box2->boundingBox();
+	if (box1Rect.intersectsRect(box2Rect))
+	{
+		return	true;
+	}
+	else
+	{
+		return	false;
+	}
 }
