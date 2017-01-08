@@ -128,7 +128,7 @@ void HelloWorld::update(float dt)
 			jumpTimer = 10;
 			jumping = false;
 		}
-		if (jumpTimer>0)
+		if (jumpTimer > 0)
 		{
 			jumpTimer--;
 			CCPoint	p = hero->getPosition();
@@ -153,10 +153,11 @@ void HelloWorld::update(float dt)
 		scoreLabel->setString(scoreTxt);
 
 	}
-	else
-	{
-		gameover();
-	}
+		else
+		{
+			gameover();
+		}
+	
 	
 }
 void HelloWorld::spawnEnemy(float dt)
@@ -277,7 +278,36 @@ void HelloWorld::gameover(){
 			gameOverLabel->setPosition(ccp(visibleSize.width	*	0.5, visibleSize.height
 				*	0.6));
 			this->addChild(gameOverLabel, 10);
+			
 		}
+	}
+	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazooka Game High Score");
+	if (gameplayLayer->score	>	highScore)
+	{
+		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazooka Game High Score", gameplayLayer->score);
+		CCUserDefault::sharedUserDefault()->flush();
+		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("NEW	HIGH SCORE",	"PixelFont.fnt");
+			newHighScoreLabel->setPosition(ccp(visibleSize.width	*	0.5,
+			visibleSize.height	*	0.5));
+		this->addChild(newHighScoreLabel, 10);
+		newHighScoreLabel->setScale(0.75);
+		CCLabelBMFont*	gOscoreLabel = CCLabelBMFont::create("0",
+			"PixelFont.fnt");
+		gOscoreLabel->setPosition(ccp(visibleSize.width	*	0.5,
+			visibleSize.height	*	0.4));
+		this->addChild(gOscoreLabel, 10);
+		gOscoreLabel->setScale(0.75);
+		char	scoreTxt[100];
+		sprintf(scoreTxt, "%d", gameplayLayer->score);
+		gOscoreLabel->setString(scoreTxt);
+	}
+	else
+	{
+		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("BETTER LUCK	NEXT	TIME",	"PixelFont.fnt");
+			newHighScoreLabel->setPosition(ccp(visibleSize.width	*	0.5,
+			visibleSize.height	*	0.5));
+		this->addChild(newHighScoreLabel, 10);
+		newHighScoreLabel->setScale(0.75);
 	}
 }
 
