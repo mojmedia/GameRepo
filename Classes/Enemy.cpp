@@ -2,11 +2,9 @@
 
 
 Enemy::Enemy()
-{
-}
+{}
 Enemy::~Enemy()
-{
-}
+{}
 Enemy* Enemy::createEnemy(GameplayLayer* _gameplayLayer)
 {
 	Enemy* ob = new Enemy();
@@ -15,7 +13,6 @@ Enemy* Enemy::createEnemy(GameplayLayer* _gameplayLayer)
 		ob->autorelease();
 		return ob;
 	}
-
 	CC_SAFE_DELETE(ob);
 	return NULL;
 }

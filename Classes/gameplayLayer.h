@@ -8,7 +8,7 @@ using namespace cocos2d;
 class GameplayLayer :public CCLayer
 {
 public:
-	GameplayLayer();
+	GameplayLayer(CCSprite* h);
 	~GameplayLayer();
 	void update();
 	CCArray* getEnemiesArray();
@@ -22,7 +22,9 @@ public:
 	CCArray* enemies;
 	CCArray* enemyBullets;
 	CCArray* enemyBulletsToBeDeleted;
-
+	CCSprite* hero;
+	int score;
+	bool gameOver;
 private:
 	CCSize visibleSize;
 };

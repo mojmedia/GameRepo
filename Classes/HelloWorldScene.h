@@ -26,7 +26,7 @@ public:
 	 void fireRocket();
 	 CCRect leftButton, rightButton;
 	 CCPoint gravity;
-
+	 void GameOver();
 	 int jumpTimer;
 	 bool jumping;
     // implement the "static node()" method manually

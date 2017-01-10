@@ -1,4 +1,5 @@
 ﻿#include "HelloWorldScene.h"
+#include "gameplayLayer.h"
 
 
 USING_NS_CC;
@@ -34,7 +35,7 @@ bool HelloWorld::init()
 	gravity = ccp(0, -5);
 	jumping = false;
 	jumpTimer = 0;
-	 
+
 	//--------------------------------------------------Enemy
 	//enemy = Enemy::createEnemy();
 	//this->addChild(enemy);
@@ -53,7 +54,7 @@ bool HelloWorld::init()
 	//CCRepeatForever *actRepeatForEver = CCRepeatForever::create(actRotate);
 	//hero->runAction(actRepeatForEver);
 	//--------------------------------------------------GameplayLayer------
-	gameplayLayer = new GameplayLayer();
+	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
 
 
@@ -81,84 +82,62 @@ bool HelloWorld::init()
 
 void HelloWorld::update(float dt)
 {
-
-
 	CCSize visiblesize = CCDirector::sharedDirector()->getVisibleSize();
 	CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-
-	gameplayLayer->update();
-
-	//CCLog("updating");
-	CCPoint p = HelloWorld::hero->getPosition();
-	//HelloWorld::hero->setPosition(ccp(p.x + 5, p.y));
-	if (p.x - hero->getContentSize().width*0.5 > visiblesize.width)
+	//-----------------------------------------------Not Game Over
+	if (!gameplayLayer->gameOver)
 	{
-		hero->setPositionX(origin.x);
-	}
-	//----------------------------------Enemies
-	if (gameplayLayer->getEnemiesArray()->count() >= 0)//راه رفتن دشمنان
-	{
-		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
+		gameplayLayer->update();
+		//CCLog("updating");
+		CCPoint p = HelloWorld::hero->getPosition();
+		//HelloWorld::hero->setPosition(ccp(p.x + 5, p.y));
+		if (p.x - hero->getContentSize().width*0.5 > visiblesize.width)
 		{
-			Enemy* e = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
-			e->update();
-			if (e->getPositionX() + e->getContentSize().width*0.5 < 0)//اگه بیرون رفته از صحنه
-			{
-				gameplayLayer->enemieasToBeDeleted->addObject(e);
-			}
+			hero->setPositionX(origin.x);
+		}
+		//---------------------------------ACCELEROMETER------شتاب سنج-----------------
+		//float maxY = visiblesize.height - hero->getContentSize().height / 2;
+		//float minY = hero->getContentSize().height / 2;
+		//float distStep = (distFraction * dt);//ضرب کار خاصی نمیکنه چون فک کنم مقدارش یکه
+		//float newY = hero->getPosition().y + distStep;
+		//newY = MIN(MAX(newY, minY), maxY);//خیلی نکته توشه 
+		//hero->setPosition(ccp(hero->getPosition().x, newY));
+		//------------------------------------JUMPPING-------------------پرش---------------
+		if (jumping)
+		{
+			jumpTimer = 10;
+			jumping = false;
+		}
+		if (jumpTimer > 0 && hero->getPositionY() < visiblesize.height - hero->getContentSize().height / 2)
+		{
+			jumpTimer--;
+			CCPoint p = hero->getPosition();
+			CCPoint mP = ccpAdd(p, ccp(0, 7));
+			hero->setPosition(ccp(hero->getPositionX(), hero->getPositionY() + 7));
+		}
+		else if (hero->getPositionY() > origin.y + hero->getContentSize().height / 2)
+		{
+			jumpTimer = 0;
+			CCPoint p = hero->getPosition();
+			CCPoint pM = ccpAdd(p, gravity);
+			hero->setPosition(pM);
 		}
 	}
-	CCObject* ee = NULL;
-	CCARRAY_FOREACH(gameplayLayer->enemieasToBeDeleted, ee)
+	else
 	{
-		Enemy *target = (Enemy*)(ee);
-		//gameplayLayer->deleteEnemy(ee);
-
-		gameplayLayer->enemies->removeObject(ee);
-		gameplayLayer->enemieasToBeDeleted->removeObject(ee);
-		this->removeChild((Enemy*)ee, true);
-	}
-	//---------------------------------ACCELEROMETER------شتاب سنج-----------------
-	//float maxY = visiblesize.height - hero->getContentSize().height / 2;
-	//float minY = hero->getContentSize().height / 2;
-	//float distStep = (distFraction * dt);//ضرب کار خاصی نمیکنه چون فک کنم مقدارش یکه
-	//float newY = hero->getPosition().y + distStep;
-	//newY = MIN(MAX(newY, minY), maxY);//خیلی نکته توشه 
-	//hero->setPosition(ccp(hero->getPosition().x, newY));
-
-	//------------------------------------JUMPPING-------------------پرش---------------
-	if (jumping)
-	{
-		jumpTimer = 10;
-		jumping = false;
-	}
-	if (jumpTimer>0 && hero->getPositionY() < visiblesize.height - hero->getContentSize().height / 2)
-	{
-		jumpTimer--;
-		CCPoint p = hero->getPosition();
-		CCPoint mP = ccpAdd(p,ccp(0, 7));
-		hero->setPosition(ccp(hero->getPositionX() , hero->getPositionY()+7));
- 
-
-	}
-	else if (hero->getPositionY() > origin.y + hero->getContentSize().height/2)
-	{
-		jumpTimer = 0;
-		CCPoint p = hero->getPosition();
-		CCPoint pM = ccpAdd(p, gravity);
-		hero->setPosition(pM);
- 
-
+		GameOver();
 	}
 }
 
 void HelloWorld::spawnEnemy(float dt)
 {
 	CCLog("spawnEnemy");
-
-	Enemy* e = Enemy::createEnemy(gameplayLayer);
-	gameplayLayer->addChild(e);
-	gameplayLayer->getEnemiesArray()->addObject(e);
+	if (!gameplayLayer->gameOver)
+	{
+		Enemy* e = Enemy::createEnemy(gameplayLayer);
+		gameplayLayer->addChild(e);
+		gameplayLayer->getEnemiesArray()->addObject(e);
+	}
 }
 
 void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
@@ -178,16 +157,17 @@ void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 	CCMoveTo* actMoveToInit = CCMoveTo::create(0.7, initPos);
 	CCSequence* actSequence = CCSequence::create(actMove, actRotateby, actTinTo,
 		actDelayTime, actMoveToInit, NULL);
-
 	//hero->runAction(actSequence);
-
-	if (rightButton.containsPoint(location))
+	if (!gameplayLayer->gameOver)
 	{
-		fireRocket();
-	}
-	else if (leftButton.containsPoint(location))
-	{
-		jumping = true;
+		if (rightButton.containsPoint(location))
+		{
+			fireRocket();
+		}
+		else if (leftButton.containsPoint(location))
+		{
+			jumping = true;
+		}
 	}
 }
 
@@ -200,7 +180,6 @@ void HelloWorld::ccTouchesMoved(CCSet* pTouches, CCEvent* event)
 void HelloWorld::ccTouchesEnded(CCSet* pTouches, CCEvent* event)
 {
 	//CCLog("end");
-
 }
 
 void HelloWorld::didAccelerate(CCAcceleration* pAccelerationValue)
@@ -232,4 +211,16 @@ void HelloWorld::fireRocket()
 	Projectile* rocket = Projectile::createProjectile(p, 2);
 	gameplayLayer->addChild(rocket);
 	gameplayLayer->getPlayerBulletsArray()->addObject(rocket);
+}
+
+void HelloWorld::GameOver()
+{
+	if (gameplayLayer->getEnemiesArray()->count() > 0)
+	{
+		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
+			en->unscheduleAllSelectors();
+		}
+	}
 }

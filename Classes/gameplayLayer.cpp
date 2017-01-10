@@ -1,14 +1,18 @@
 #include "gameplayLayer.h"
+#include "Enemy.h"
 
-
-GameplayLayer::GameplayLayer()
+GameplayLayer::GameplayLayer(CCSprite* hero)
 {
+	this->hero = hero;
 	visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 	enemies = new CCArray();
 	enemieasToBeDeleted = new CCArray();
 	enemyBullets = new CCArray();
 	enemyBulletsToBeDeleted = new CCArray();
 	playerBullets = new CCArray();
+	score = 0;
+	gameOver = false;
+
 }
 
 GameplayLayer::~GameplayLayer()
@@ -26,18 +30,19 @@ void GameplayLayer::update()
 	{
 		for (int i = 0; i < enemies->count(); i++)
 		{
-			Projectile* pr = (Projectile*)enemies->objectAtIndex(i);
-			pr->update();
-			if (pr->getPositionX() < 0)
+			Enemy* e = (Enemy*)enemies->objectAtIndex(i);
+			e->update();
+			if (e->getPositionX() < 0)
 			{
-				enemieasToBeDeleted->addObject(pr);
+				gameOver = true;
+				enemieasToBeDeleted->addObject(e);
 			}
 		}
 	}
 	CCObject* eb = NULL;
 	CCARRAY_FOREACH(enemieasToBeDeleted, eb)
 	{
-		Projectile *target = (Projectile*)(eb);
+		Enemy *target = (Enemy*)(eb);
 		enemies->removeObject(target);
 		enemieasToBeDeleted->removeObject(target);
 		this->removeChild(target, true);
@@ -74,6 +79,44 @@ void GameplayLayer::update()
 			{
 				this->removeChild(p);
 				playerBullets->removeObject(p);
+			}
+		}
+	}
+	//-----------------------player rocket and enemies collision---------------
+	if (playerBullets->count() >= 0)
+	{
+		for (int i = 0; i < playerBullets->count(); i++)
+		{
+			Projectile* p = (Projectile*)playerBullets->objectAtIndex(i);
+			if (enemies->count() > 0)
+			{
+				for (int j = 0; j < enemies->count(); j++)
+				{
+					Enemy* en = (Enemy*)enemies->objectAtIndex(j);
+					if (checkBoxCollision(p, en))
+					{
+						score++;
+						this->removeChild(p);
+						playerBullets->removeObject(p);
+						enemyBulletsToBeDeleted->addObject(en);
+						this->removeChild(en);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	//----------------------------------enemy bullets and player collision--------------
+	if (enemyBullets->count() > 0)
+	{
+		for (int i = 0; i < enemyBullets->count(); i++)
+		{
+			Projectile* pr = (Projectile*)enemyBullets->objectAtIndex(i);
+			if (checkBoxCollision(pr, hero))
+			{
+				enemyBulletsToBeDeleted->addObject(pr);
+				gameOver = true;
 			}
 		}
 	}
