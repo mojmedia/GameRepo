@@ -25,6 +25,10 @@ public:
 	 void spawnEnemy(float dt);
 	 void fireRocket();
 	 CCRect leftButton, rightButton;
+	 CCPoint gravity;
+
+	 int jumpTimer;
+	 bool jumping;
     // implement the "static node()" method manually
 	 //touch handle
 	 virtual void ccTouchesBegan(CCSet* pTouches , CCEvent* event);

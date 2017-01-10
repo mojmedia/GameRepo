@@ -31,6 +31,10 @@ bool HelloWorld::init()
 	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 	CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 
+	gravity = ccp(0, -5);
+	jumping = false;
+	jumpTimer = 0;
+	 
 	//--------------------------------------------------Enemy
 	//enemy = Enemy::createEnemy();
 	//this->addChild(enemy);
@@ -58,13 +62,13 @@ bool HelloWorld::init()
 		, visibleSize.height);
 	//--------------------------------------------------btn------
 
-//	auto pCloseItem = CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png");
-////menu_selector(HelloWorld::buttonControl)
-//	pCloseItem->setPosition(ccp(0.125 * visibleSize.width, 0.125 * visibleSize.height));
-//
-//	CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-//	pMenu->setPosition(CCPointZero);
-//	this->addChild(pMenu, 1);
+	//	auto pCloseItem = CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png");
+	////menu_selector(HelloWorld::buttonControl)
+	//	pCloseItem->setPosition(ccp(0.125 * visibleSize.width, 0.125 * visibleSize.height));
+	//
+	//	CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
+	//	pMenu->setPosition(CCPointZero);
+	//	this->addChild(pMenu, 1);
 
 
 	this->setTouchEnabled(true);
@@ -114,15 +118,38 @@ void HelloWorld::update(float dt)
 		gameplayLayer->enemieasToBeDeleted->removeObject(ee);
 		this->removeChild((Enemy*)ee, true);
 	}
-
 	//---------------------------------ACCELEROMETER------شتاب سنج-----------------
-	float maxY = visiblesize.height - hero->getContentSize().height / 2;
-	float minY = hero->getContentSize().height / 2;
-	float distStep = (distFraction * dt);//ضرب کار خاصی نمیکنه چون فک کنم مقدارش یکه
-	float newY = hero->getPosition().y + distStep;
-	newY = MIN(MAX(newY, minY), maxY);//خیلی نکته توشه 
-	hero->setPosition(ccp(hero->getPosition().x, newY));
+	//float maxY = visiblesize.height - hero->getContentSize().height / 2;
+	//float minY = hero->getContentSize().height / 2;
+	//float distStep = (distFraction * dt);//ضرب کار خاصی نمیکنه چون فک کنم مقدارش یکه
+	//float newY = hero->getPosition().y + distStep;
+	//newY = MIN(MAX(newY, minY), maxY);//خیلی نکته توشه 
+	//hero->setPosition(ccp(hero->getPosition().x, newY));
 
+	//------------------------------------JUMPPING-------------------پرش---------------
+	if (jumping)
+	{
+		jumpTimer = 10;
+		jumping = false;
+	}
+	if (jumpTimer>0 && hero->getPositionY() < visiblesize.height - hero->getContentSize().height / 2)
+	{
+		jumpTimer--;
+		CCPoint p = hero->getPosition();
+		CCPoint mP = ccpAdd(p,ccp(0, 7));
+		hero->setPosition(ccp(hero->getPositionX() , hero->getPositionY()+7));
+ 
+
+	}
+	else if (hero->getPositionY() > origin.y + hero->getContentSize().height/2)
+	{
+		jumpTimer = 0;
+		CCPoint p = hero->getPosition();
+		CCPoint pM = ccpAdd(p, gravity);
+		hero->setPosition(pM);
+ 
+
+	}
 }
 
 void HelloWorld::spawnEnemy(float dt)
@@ -142,21 +169,25 @@ void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 	CCPoint location = touch->getLocationInView();//مکانی از شیء که تاچ خورده 
 	location = CCDirector::sharedDirector()->convertToGL(location);//تبدیل سیستم مکان دهی از ویو کوردینیت به جی ال 
 
-	//CCPoint initPos = hero->getPosition();
-	//CCMoveBy* actMove = CCMoveBy::create(1, location);
-	//CCRotateBy* actRotateby = CCRotateBy::create(1.5, 720);
+	CCPoint initPos = hero->getPosition();
+	CCMoveTo* actMove = CCMoveTo::create(0.6, location);
+	CCRotateBy* actRotateby = CCRotateBy::create(1.5, 720);
 
-	//CCBlink* actTinTo = CCBlink::create(1.0, 5);
-	//CCDelayTime* actDelayTime = CCDelayTime::create(0.3);
-	//CCMoveTo* actMoveToInit = CCMoveTo::create(0.7, initPos);
-	//CCSequence* actSequence = CCSequence::create(actMove, actRotateby, actTinTo,
-	//	actDelayTime, actMoveToInit, NULL);
+	CCBlink* actTinTo = CCBlink::create(1.0, 5);
+	CCDelayTime* actDelayTime = CCDelayTime::create(0.3);
+	CCMoveTo* actMoveToInit = CCMoveTo::create(0.7, initPos);
+	CCSequence* actSequence = CCSequence::create(actMove, actRotateby, actTinTo,
+		actDelayTime, actMoveToInit, NULL);
 
 	//hero->runAction(actSequence);
 
 	if (rightButton.containsPoint(location))
 	{
 		fireRocket();
+	}
+	else if (leftButton.containsPoint(location))
+	{
+		jumping = true;
 	}
 }
 

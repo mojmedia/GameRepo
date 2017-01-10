@@ -17,6 +17,7 @@ public:
 	CCArray* getPlayerBulletsArray();
 	void deleteEnemy(CCObject *target);
 	CCArray* getEnemyBulletsArray();
+	bool checkBoxCollision(CCSprite* box1, CCSprite *box2);
 
 	CCArray* enemies;
 	CCArray* enemyBullets;

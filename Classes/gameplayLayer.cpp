@@ -94,3 +94,17 @@ CCArray* GameplayLayer::getPlayerBulletsArray()
 {
 	return playerBullets;
 }
+
+bool GameplayLayer::checkBoxCollision(CCSprite* box1, CCSprite *box2)
+{
+	CCRect box1Rect = box1->boundingBox();
+	CCRect box2Rect = box2->boundingBox();
+	if (box1Rect.intersectsRect(box2Rect))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
