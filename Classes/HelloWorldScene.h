@@ -4,7 +4,8 @@
 #include "cocos2d.h"
 #include "Enemy.h"
 #include "gameplayLayer.h"
-
+#include "HUDLayer.h"
+#include "ScrollingBgLayer.h"
 using namespace cocos2d;
 
 class HelloWorld : public cocos2d::CCLayer
@@ -15,9 +16,14 @@ public:
 	Enemy* enemy;
 	float distFraction;
 	GameplayLayer* gameplayLayer;
+	CCLabelBMFont* scoreLabel;
+	HUDLayer* hudLayer;
+	ScrollingBgLayer* scrollingBgLayer;
 
 	virtual bool init();
 
+	void gamePaused();
+	void gameResumed();
     // there's no 'id' in cpp, so we recommend returning the class instance pointer
     static cocos2d::CCScene* scene();
     

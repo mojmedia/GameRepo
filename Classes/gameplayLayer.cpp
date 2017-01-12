@@ -34,15 +34,15 @@ void GameplayLayer::update()
 			e->update();
 			if (e->getPositionX() < 0)
 			{
-				gameOver = true;
+				//gameOver = true;
 				enemieasToBeDeleted->addObject(e);
 			}
 		}
 	}
-	CCObject* eb = NULL;
-	CCARRAY_FOREACH(enemieasToBeDeleted, eb)
+	CCObject* ee = NULL;
+	CCARRAY_FOREACH(enemieasToBeDeleted, ee)
 	{
-		Enemy *target = (Enemy*)(eb);
+		Enemy *target = (Enemy*)(ee);
 		enemies->removeObject(target);
 		enemieasToBeDeleted->removeObject(target);
 		this->removeChild(target, true);

@@ -1,7 +1,6 @@
 ﻿#include "HelloWorldScene.h"
 #include "gameplayLayer.h"
 
-
 USING_NS_CC;
 
 CCScene* HelloWorld::scene()
@@ -35,17 +34,22 @@ bool HelloWorld::init()
 	gravity = ccp(0, -5);
 	jumping = false;
 	jumpTimer = 0;
+	scrollingBgLayer = new ScrollingBgLayer(3.0);
+	this->addChild(scrollingBgLayer);
 
-	//--------------------------------------------------Enemy
+	hudLayer = new HUDLayer();
+	this->addChild(hudLayer, 15); //keeping at top most layer
+
+	//--------------------------------------------------Enemy--------
 	//enemy = Enemy::createEnemy();
 	//this->addChild(enemy);
 
-	//--------------------------------------------------BackGround
-	CCSprite* bg = CCSprite::create("bookGame_Bg.png");
-	bg->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.5));
-	this->addChild(bg, -1);
+	//--------------------------------------------------BackGround-----
+	//CCSprite* bg = CCSprite::create("bookGame_Bg.png");
+	//bg->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.5));
+	//this->addChild(bg, -1);
 
-	//--------------------------------------------------Hero
+	//--------------------------------------------------Hero-------
 	HelloWorld::hero = CCSprite::create("bookGame_tinyBazooka.png");
 	HelloWorld::hero->setPosition(ccp(visibleSize.width * 0.25, visibleSize.height * 0.5));
 	//hero->setAnchorPoint(ccp(0.75, 0.75));
@@ -53,7 +57,7 @@ bool HelloWorld::init()
 	//CCRotateBy* actRotate = CCRotateBy::create(0.75, 270);
 	//CCRepeatForever *actRepeatForEver = CCRepeatForever::create(actRotate);
 	//hero->runAction(actRepeatForEver);
-	//--------------------------------------------------GameplayLayer------
+	//---------------------------------------------GameplayLayer------
 	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
 
@@ -82,12 +86,17 @@ bool HelloWorld::init()
 
 void HelloWorld::update(float dt)
 {
-	CCSize visiblesize = CCDirector::sharedDirector()->getVisibleSize();
-	CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+
 	//-----------------------------------------------Not Game Over
 	if (!gameplayLayer->gameOver)
 	{
+		scrollingBgLayer->update();
+		CCSize visiblesize = CCDirector::sharedDirector()->getVisibleSize();
+		CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
 		gameplayLayer->update();
+
+		hudLayer->updateScore(gameplayLayer->score);
+
 		//CCLog("updating");
 		CCPoint p = HelloWorld::hero->getPosition();
 		//HelloWorld::hero->setPosition(ccp(p.x + 5, p.y));
@@ -131,9 +140,10 @@ void HelloWorld::update(float dt)
 
 void HelloWorld::spawnEnemy(float dt)
 {
-	CCLog("spawnEnemy");
+
 	if (!gameplayLayer->gameOver)
 	{
+		CCLog("spawnEnemy");
 		Enemy* e = Enemy::createEnemy(gameplayLayer);
 		gameplayLayer->addChild(e);
 		gameplayLayer->getEnemiesArray()->addObject(e);
@@ -142,24 +152,24 @@ void HelloWorld::spawnEnemy(float dt)
 
 void HelloWorld::ccTouchesBegan(CCSet* pTouches, CCEvent* event)
 {
-	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
-	//CCLog("began");
-	CCTouch *touch = (CCTouch*)pTouches->anyObject();//گرفتن شیئی که تاچ خورده است
-	CCPoint location = touch->getLocationInView();//مکانی از شیء که تاچ خورده 
-	location = CCDirector::sharedDirector()->convertToGL(location);//تبدیل سیستم مکان دهی از ویو کوردینیت به جی ال 
-
-	CCPoint initPos = hero->getPosition();
-	CCMoveTo* actMove = CCMoveTo::create(0.6, location);
-	CCRotateBy* actRotateby = CCRotateBy::create(1.5, 720);
-
-	CCBlink* actTinTo = CCBlink::create(1.0, 5);
-	CCDelayTime* actDelayTime = CCDelayTime::create(0.3);
-	CCMoveTo* actMoveToInit = CCMoveTo::create(0.7, initPos);
-	CCSequence* actSequence = CCSequence::create(actMove, actRotateby, actTinTo,
-		actDelayTime, actMoveToInit, NULL);
-	//hero->runAction(actSequence);
 	if (!gameplayLayer->gameOver)
 	{
+		CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+		//CCLog("began");
+		CCTouch *touch = (CCTouch*)pTouches->anyObject();//گرفتن شیئی که تاچ خورده است
+		CCPoint location = touch->getLocationInView();//مکانی از شیء که تاچ خورده 
+		location = CCDirector::sharedDirector()->convertToGL(location);//تبدیل سیستم مکان دهی از ویو کوردینیت به جی ال 
+
+		CCPoint initPos = hero->getPosition();
+		CCMoveTo* actMove = CCMoveTo::create(0.6, location);
+		CCRotateBy* actRotateby = CCRotateBy::create(1.5, 720);
+
+		CCBlink* actTinTo = CCBlink::create(1.0, 5);
+		CCDelayTime* actDelayTime = CCDelayTime::create(0.3);
+		CCMoveTo* actMoveToInit = CCMoveTo::create(0.7, initPos);
+		CCSequence* actSequence = CCSequence::create(actMove, actRotateby, actTinTo,
+			actDelayTime, actMoveToInit, NULL);
+		//hero->runAction(actSequence);
 		if (rightButton.containsPoint(location))
 		{
 			fireRocket();
@@ -215,12 +225,89 @@ void HelloWorld::fireRocket()
 
 void HelloWorld::GameOver()
 {
-	if (gameplayLayer->getEnemiesArray()->count() > 0)
+	CCSize visibleSize = CCDirector::sharedDirector()->getVisibleSize();
+	CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
+
+
+	//--------------------------------
+	this->unscheduleUpdate();
+	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
+	if (gameplayLayer->getEnemiesArray()->count() >0)
 	{
-		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
 		{
 			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
-			en->unscheduleAllSelectors();
+			en->pauseSchedulerAndActions();
+			//en->cleanup();
+		}
+	}
+	//--------------------------------
+
+	//if (gameplayLayer->getEnemiesArray()->count() > 0)
+	//{
+	//	for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
+	//	{
+	//		Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
+	//		en->unscheduleAllSelectors();
+	//	}
+	//}
+
+	CCLabelBMFont* gameOverLabel = CCLabelBMFont::create("GAMEOVER SHODI", "PixelFont.fnt");
+	gameOverLabel->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height* 0.6));
+	this->addChild(gameOverLabel, 10);
+
+	int highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazookaGameHighScore");
+
+	if (gameplayLayer->score > highScore)
+	{
+		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazookaGameHighScore", gameplayLayer->score);
+		CCUserDefault::sharedUserDefault()->flush();
+		CCLabelBMFont* newHighScoreLabel = CCLabelBMFont::create("NEW HIGH SCORE", "font.fnt");
+		newHighScoreLabel->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.4));
+		this->addChild(newHighScoreLabel, 10);
+		newHighScoreLabel->setScale(0.75);
+		CCLabelBMFont* gOscoreLabel = CCLabelBMFont::create("0", "font.fnt");
+		gOscoreLabel->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.25));
+		this->addChild(gOscoreLabel, 10);
+		gOscoreLabel->setScale(0.75);
+		char scoreTxt[100];
+		sprintf(scoreTxt, "%d", gameplayLayer->score);
+		gOscoreLabel->setString(scoreTxt);
+	}
+	else
+	{
+		CCLabelBMFont* newHighScoreLabel = CCLabelBMFont::create("BETTERLUCK NEXT TIME", "font.fnt");
+		newHighScoreLabel->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.5));
+		this->addChild(newHighScoreLabel, 10);
+		newHighScoreLabel->setScale(0.75);
+	}
+}
+
+void HelloWorld::gamePaused()
+{
+	this->unscheduleUpdate();
+	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
+	if (gameplayLayer->getEnemiesArray()->count() >0)
+	{
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray() ->objectAtIndex(i);
+			en->pauseSchedulerAndActions();
+			 
+		}
+	}
+}
+
+void HelloWorld::gameResumed()
+{
+	this->scheduleUpdate();
+	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 3.0);
+	if (gameplayLayer->getEnemiesArray()->count() >0)
+	{
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray() ->objectAtIndex(i);
+			en->resumeSchedulerAndActions();
 		}
 	}
 }

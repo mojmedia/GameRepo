@@ -19,7 +19,7 @@ public:
 	CCArray* getEnemyBulletsArray();
 	bool checkBoxCollision(CCSprite* box1, CCSprite *box2);
 
-	CCArray* enemies;
+	
 	CCArray* enemyBullets;
 	CCArray* enemyBulletsToBeDeleted;
 	CCSprite* hero;
@@ -27,6 +27,7 @@ public:
 	bool gameOver;
 private:
 	CCSize visibleSize;
+	CCArray* enemies;
 };
 
 #endif //__wp8Game__GameplayLayer
