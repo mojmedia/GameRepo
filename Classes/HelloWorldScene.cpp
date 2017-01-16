@@ -52,11 +52,25 @@ bool HelloWorld::init()
 	//--------------------------------------------------Hero-------
 	HelloWorld::hero = CCSprite::create("bookGame_tinyBazooka.png");
 	HelloWorld::hero->setPosition(ccp(visibleSize.width * 0.25, visibleSize.height * 0.5));
-	//hero->setAnchorPoint(ccp(0.75, 0.75));
 	this->addChild(HelloWorld::hero, 0);
-	//CCRotateBy* actRotate = CCRotateBy::create(0.75, 270);
-	//CCRepeatForever *actRepeatForEver = CCRepeatForever::create(actRotate);
-	//hero->runAction(actRepeatForEver);
+	//کار با انیمیشن به سبک spritesheet میباشد
+	CCSpriteBatchNode* spritebatch = CCSpriteBatchNode::create("player_anim.png");
+	CCSpriteFrameCache* cache = CCSpriteFrameCache::sharedSpriteFrameCache();
+	cache->addSpriteFramesWithFile("player_anim.plist");
+	hero->createWithSpriteFrameName("player_idle_1.png");
+	hero->addChild(spritebatch);
+	//idle animation
+	CCArray* animFrames = CCArray::createWithCapacity(4);
+	char str1[100] = { 0 };
+	for (int i = 1; i <= 4; i++)
+	{
+		sprintf(str1, "player_idle_%d.png", i);
+		CCSpriteFrame* frame = cache->spriteFrameByName(str1);
+		animFrames->addObject(frame);
+	}
+	CCAnimation* idleanimation = CCAnimation::createWithSpriteFrames(animFrames, 0.25f);
+	hero->runAction(CCRepeatForever::create(CCAnimate::create(idleanimation)));//4-5 خط کد است 
+
 	//---------------------------------------------GameplayLayer------
 	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
@@ -232,9 +246,9 @@ void HelloWorld::GameOver()
 	//--------------------------------
 	this->unscheduleUpdate();
 	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
-	if (gameplayLayer->getEnemiesArray()->count() >0)
+	if (gameplayLayer->getEnemiesArray()->count() > 0)
 	{
-		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
 		{
 			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
 			en->pauseSchedulerAndActions();
@@ -287,13 +301,13 @@ void HelloWorld::gamePaused()
 {
 	this->unscheduleUpdate();
 	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
-	if (gameplayLayer->getEnemiesArray()->count() >0)
+	if (gameplayLayer->getEnemiesArray()->count() > 0)
 	{
-		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
 		{
-			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray() ->objectAtIndex(i);
+			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
 			en->pauseSchedulerAndActions();
-			 
+
 		}
 	}
 }
@@ -302,11 +316,11 @@ void HelloWorld::gameResumed()
 {
 	this->scheduleUpdate();
 	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 3.0);
-	if (gameplayLayer->getEnemiesArray()->count() >0)
+	if (gameplayLayer->getEnemiesArray()->count() > 0)
 	{
-		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		for (int i = 0; i < gameplayLayer->getEnemiesArray()->count(); i++)
 		{
-			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray() ->objectAtIndex(i);
+			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
 			en->resumeSchedulerAndActions();
 		}
 	}
