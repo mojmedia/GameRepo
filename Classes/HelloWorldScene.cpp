@@ -40,15 +40,6 @@ bool HelloWorld::init()
 	hudLayer = new HUDLayer();
 	this->addChild(hudLayer, 15); //keeping at top most layer
 
-	//--------------------------------------------------Enemy--------
-	//enemy = Enemy::createEnemy();
-	//this->addChild(enemy);
-
-	//--------------------------------------------------BackGround-----
-	//CCSprite* bg = CCSprite::create("bookGame_Bg.png");
-	//bg->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.5));
-	//this->addChild(bg, -1);
-
 	//--------------------------------------------------Hero-------
 	HelloWorld::hero = CCSprite::create("bookGame_tinyBazooka.png");
 	HelloWorld::hero->setPosition(ccp(visibleSize.width * 0.25, visibleSize.height * 0.5));
@@ -59,7 +50,7 @@ bool HelloWorld::init()
 	cache->addSpriteFramesWithFile("player_anim.plist");
 	hero->createWithSpriteFrameName("player_idle_1.png");
 	hero->addChild(spritebatch);
-	//idle animation
+	//انیمیشن حالت معمولی
 	CCArray* animFrames = CCArray::createWithCapacity(4);
 	char str1[100] = { 0 };
 	for (int i = 1; i <= 4; i++)
@@ -69,26 +60,30 @@ bool HelloWorld::init()
 		animFrames->addObject(frame);
 	}
 	CCAnimation* idleanimation = CCAnimation::createWithSpriteFrames(animFrames, 0.25f);
-	hero->runAction(CCRepeatForever::create(CCAnimate::create(idleanimation)));//4-5 خط کد است 
-
+	//hero->runAction(CCRepeatForever::create(CCAnimate::create(idleanimation)));//4-5 خط کد است 
+	mIdleAction = CCRepeatForever::create(CCAnimate::create(idleanimation));
+	mIdleAction->retain();
+	//پرش animation
+	animFrames->removeAllObjects();
+	char str2[100] = { 0 };
+	for (int i = 1; i <= 4; i++)
+	{
+		sprintf(str2, "player_boost_%d.png", i);
+		CCSpriteFrame* frame = cache->spriteFrameByName(str2);
+		animFrames->addObject(frame);
+	}
+	CCAnimation* boostanimation = CCAnimation::createWithSpriteFrames(animFrames, 0.25f);
+	hero->runAction(CCRepeatForever::create(CCAnimate::create(boostanimation)));
+	mBoostAction = CCRepeatForever::create(CCAnimate::create(boostanimation));
+	mBoostAction->retain();
 	//---------------------------------------------GameplayLayer------
 	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
-
 
 	leftButton = CCRectMake(0, 0, visibleSize.width / 2, visibleSize.height);
 	rightButton = CCRectMake(visibleSize.width / 2, 0, visibleSize.width / 2
 		, visibleSize.height);
 	//--------------------------------------------------btn------
-
-	//	auto pCloseItem = CCMenuItemImage::create("CloseNormal.png", "CloseSelected.png");
-	////menu_selector(HelloWorld::buttonControl)
-	//	pCloseItem->setPosition(ccp(0.125 * visibleSize.width, 0.125 * visibleSize.height));
-	//
-	//	CCMenu* pMenu = CCMenu::create(pCloseItem, NULL);
-	//	pMenu->setPosition(CCPointZero);
-	//	this->addChild(pMenu, 1);
-
 
 	this->setTouchEnabled(true);
 	this->setAccelerometerEnabled(true);
@@ -119,12 +114,14 @@ void HelloWorld::update(float dt)
 			hero->setPositionX(origin.x);
 		}
 		//---------------------------------ACCELEROMETER------شتاب سنج-----------------
+
 		//float maxY = visiblesize.height - hero->getContentSize().height / 2;
 		//float minY = hero->getContentSize().height / 2;
 		//float distStep = (distFraction * dt);//ضرب کار خاصی نمیکنه چون فک کنم مقدارش یکه
 		//float newY = hero->getPosition().y + distStep;
 		//newY = MIN(MAX(newY, minY), maxY);//خیلی نکته توشه 
 		//hero->setPosition(ccp(hero->getPosition().x, newY));
+
 		//------------------------------------JUMPPING-------------------پرش---------------
 		if (jumping)
 		{
@@ -133,6 +130,7 @@ void HelloWorld::update(float dt)
 		}
 		if (jumpTimer > 0 && hero->getPositionY() < visiblesize.height - hero->getContentSize().height / 2)
 		{
+			mPlayerState = kPlayerStateBoost;
 			jumpTimer--;
 			CCPoint p = hero->getPosition();
 			CCPoint mP = ccpAdd(p, ccp(0, 7));
@@ -140,11 +138,13 @@ void HelloWorld::update(float dt)
 		}
 		else if (hero->getPositionY() > origin.y + hero->getContentSize().height / 2)
 		{
+			mPlayerState = kPLayerStateIdle;
 			jumpTimer = 0;
 			CCPoint p = hero->getPosition();
 			CCPoint pM = ccpAdd(p, gravity);
 			hero->setPosition(pM);
 		}
+		this->AnimationStates();
 	}
 	else
 	{
@@ -323,5 +323,38 @@ void HelloWorld::gameResumed()
 			Enemy* en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
 			en->resumeSchedulerAndActions();
 		}
+	}
+}
+
+void HelloWorld::idleAnim()
+{
+	if (mActionState != kActionStateIdle)
+	{
+		hero->stopAllActions();
+		hero->runAction(mIdleAction);
+		mActionState = kActionStateIdle;
+	}
+}
+
+void HelloWorld::boostAnim()
+{
+	if (mActionState != kActionStateBoost)
+	{
+		hero->stopAllActions();
+		hero->runAction(mBoostAction);
+		mActionState = kActionStateBoost;
+	}
+}
+
+void HelloWorld::AnimationStates()
+{
+	CCLOG("action state");
+	switch (mPlayerState)
+	{
+	case kPLayerStateIdle:
+		this->idleAnim(); break;
+	case kPlayerStateBoost:
+		this->boostAnim(); break;
+	default: break;
 	}
 }
