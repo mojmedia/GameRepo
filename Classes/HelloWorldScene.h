@@ -4,6 +4,8 @@
 #include "cocos2d.h"
 #include "Enemy.h"
 #include "GameplayLayer.h"
+#include "HUDLayer.h"
+
 USING_NS_CC;
 class HelloWorld : public cocos2d::CCLayer
 {
@@ -11,8 +13,8 @@ public:
 	CCSprite*	hero;
 	CCSize visibleSize;
 	float distFraction;
-	CCLabelBMFont *scoreLabel;
 	int highScore;
+	HUDLayer* hudLayer;
 	//Enemy*	enemy;
 	GameplayLayer* gameplayLayer;
     // Here's a difference. Method 'init' in cocos2d-x returns bool, instead of returning 'id' in cocos2d-iphone

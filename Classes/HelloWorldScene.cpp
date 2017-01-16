@@ -62,6 +62,9 @@ bool HelloWorld::init()
 	leftButton = CCRectMake(0, 0, visibleSize.width / 2, visibleSize.height);
 	rightButton = CCRectMake(visibleSize.width / 2, 0, visibleSize.width / 2,
 		visibleSize.height);
+	//................hud...................
+	hudLayer = new	HUDLayer();
+	this->addChild(hudLayer, 15);
 	//..................arrowkey................
 	/*CCMenuItemImage	*arrowleft = CCMenuItemImage::create("l.png",
 		"l-1.png", this, menu_selector(HelloWorld::buttonControlleft));
@@ -92,13 +95,7 @@ bool HelloWorld::init()
 	//....................gravity...........
 	gravity = ccp(0, -5);
 	jumping = false;
-	jumpTimer = 0;
-	//.....................scoring.............
-	scoreLabel = CCLabelBMFont::create("Score:	0", "PixelFont.fnt");
-	scoreLabel->setPosition(ccp(visibleSize.width	*	0.870, visibleSize.height	*
-		0.9));
-	this->addChild(scoreLabel, 10);
-	scoreLabel->setScale(0.5);
+	jumpTimer = 0;	
     return true;
 }
 void HelloWorld::update(float dt)
@@ -148,9 +145,7 @@ void HelloWorld::update(float dt)
 		newY = MIN(MAX(newY, minY), maxY);
 		hero->setPosition(ccp(hero->getPosition().x, newY));
 		//................scoring................
-		char	scoreTxt[100];
-		sprintf(scoreTxt, "Score:	%d", gameplayLayer->score);
-		scoreLabel->setString(scoreTxt);
+		hudLayer->updateScore(gameplayLayer->score);
 
 	}
 		else
