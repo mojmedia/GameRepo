@@ -262,6 +262,8 @@ void	HelloWorld::fireRocket()
 	gameplayLayer->getPlayerBulletsArray()->addObject(rocket);
 }
 void HelloWorld::gameover(){
+	this->unscheduleUpdate();
+	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
 	if (gameplayLayer->getEnemiesArray()->count() >0)
 	{
 		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
@@ -277,7 +279,7 @@ void HelloWorld::gameover(){
 		}
 	}
 	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazooka Game High Score");
-	if (gameplayLayer->score	>	highScore)
+	if (gameplayLayer->score>highScore)
 	{
 		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazooka Game High Score", gameplayLayer->score);
 		CCUserDefault::sharedUserDefault()->flush();
@@ -303,6 +305,32 @@ void HelloWorld::gameover(){
 			visibleSize.height	*	0.5));
 		this->addChild(newHighScoreLabel, 10);
 		newHighScoreLabel->setScale(0.75);
+	}
+}
+void HelloWorld::gamePaused()
+{
+	this->unscheduleUpdate();
+	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
+	if (gameplayLayer->getEnemiesArray()->count()>0)
+	{
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy*	en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
+			en->pauseSchedulerAndActions();
+		}
+	}
+}
+void	HelloWorld::gameResumed()
+{
+	this->scheduleUpdate();
+	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 3.0);
+	if (gameplayLayer->getEnemiesArray()->count()>0)
+	{
+		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
+		{
+			Enemy*	en = (Enemy*)gameplayLayer->getEnemiesArray()->objectAtIndex(i);
+			en->resumeSchedulerAndActions();
+		}
 	}
 }
 
