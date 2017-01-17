@@ -39,10 +39,12 @@ bool HelloWorld::init()
     //    you may modify it.
 
 	//...................background............
-	CCSprite*	bg = CCSprite::create("bookGame_Bg.png");
+	/*CCSprite*	bg = CCSprite::create("bookGame_Bg.png");
 	bg->setPosition(ccp(visibleSize.width *	0.5, visibleSize.height	* 0.5));
-	this->addChild(bg, -1);
-
+	this->addChild(bg, -1);*/
+	//...........scrolling........................
+	scrollingBgLayer = new	ScrollingBgLayer(3.0);
+	this->addChild(scrollingBgLayer);
 	//.................hero....................
 	hero = CCSprite::create("bookGame_tinyBazooka.png");
 	hero->setPosition(ccp(visibleSize.width	*	0.25, visibleSize.height	*
@@ -104,6 +106,8 @@ void HelloWorld::update(float dt)
 	{
 		//enemy->update();
 		gameplayLayer->update();
+		//.......scroling
+		scrollingBgLayer->update();
 		//CCLog("update");
 		/*CCPoint	p = hero->getPosition();
 		hero->setPosition(ccp(p.x + 5, p.y));
