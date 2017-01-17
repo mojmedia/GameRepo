@@ -76,22 +76,28 @@ bool HelloWorld::init()
 	hero->runAction(CCRepeatForever::create(CCAnimate::create(boostanimation)));
 	mBoostAction = CCRepeatForever::create(CCAnimate::create(boostanimation));
 	mBoostAction->retain();
-	//---------------------------------------------GameplayLayer------
+
+	//----------------------------skeleton animation------------------------
+	skeletonNode = extension::CCSkeletonAnimation::createWithFile("player.json", "player.atlas", 1.0f);
+	skeletonNode->addAnimation("runCycle", true, 0, 0);
+	skeletonNode->setPosition(ccp(visibleSize.width / 2, skeletonNode->getContentSize().height / 2));
+	addChild(skeletonNode);
+	//---------------------------------------------GameplayLayer------------
 	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
 
 	leftButton = CCRectMake(0, 0, visibleSize.width / 2, visibleSize.height);
 	rightButton = CCRectMake(visibleSize.width / 2, 0, visibleSize.width / 2
 		, visibleSize.height);
-	//--------------------------------------------------btn------
-
+	//-----------صدازدن توابعی از کوکوس ک برای برنامه حیاتی هستند----------
 	this->setTouchEnabled(true);
 	this->setAccelerometerEnabled(true);
-
 	this->scheduleUpdate();
-	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 3.0);
+	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 1.0);
 	return true;
-}
+	
+
+}//HelloWorld::init()
 
 void HelloWorld::update(float dt)
 {

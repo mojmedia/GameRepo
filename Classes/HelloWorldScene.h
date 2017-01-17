@@ -6,6 +6,8 @@
 #include "gameplayLayer.h"
 #include "HUDLayer.h"
 #include "ScrollingBgLayer.h"
+#include <spine/spine-cocos2dx.h>
+
 using namespace cocos2d;
 
 class HelloWorld : public cocos2d::CCLayer
@@ -19,6 +21,7 @@ public:
 	CCLabelBMFont* scoreLabel;
 	HUDLayer* hudLayer;
 	ScrollingBgLayer* scrollingBgLayer;
+	extension::CCSkeletonAnimation* skeletonNode; 
 
 	virtual bool init();
 
