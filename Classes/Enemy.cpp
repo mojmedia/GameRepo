@@ -22,11 +22,16 @@ bool	Enemy::initEnemy(GameplayLayer* _gameplayLayer)
 	CCSize	visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 	float	mrand = rand() % 3 + 1;
 	//CCLOG("random	height	%f", mrand);
-	float	h = visibleSize.height	*	mrand	*	0.25;
+	float	h = visibleSize.height * mrand *0.25;
 	this->initWithFile("bookGame_enemy.png");
-	CCPoint	p = ccp(visibleSize.width + this->getContentSize().width / 2,
-		h);
+	CCPoint	p = ccp(visibleSize.width + this->getContentSize().width / 2,h);
 	this->setPosition(p);
+	
+	
+	
+	
+	
+	
 	this->schedule(schedule_selector(Enemy::shoot), 1.3);
 	return	true;
 }

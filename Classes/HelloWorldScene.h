@@ -7,10 +7,28 @@
 #include "HUDLayer.h"
 #include "ScrollingBgLayer.h"
 
+
 USING_NS_CC;
 class HelloWorld : public cocos2d::CCLayer
 {
+	typedef	enum ActionState
+	{
+		kActionStateNone = 0,
+		kActionStateIdle,
+		kActionStateBoost
+	};
+	typedef	enum PlayerState
+	{
+		kPlayerStateNone = 0,
+		kPLayerStateIdle,
+		kPlayerStateBoost
+	};
+	ActionState	mActionState;
+	PlayerState	mPlayerState;
+	CCAction *mIdleAction;
+	CCAction *mBoostAction;
 public:
+
 	CCSprite*	hero;
 	CCSize visibleSize;
 	float distFraction;
@@ -53,6 +71,11 @@ public:
 	virtual	void ccTouchesEnded(CCSet* pTouches, CCEvent *event);
 	//..................accelerometer...............
 	virtual	void	didAccelerate(CCAcceleration*	pAccelerationValue);
+	
+	// .............animation.........
+	void idleAnim();
+	void boostAnim();
+	void AnimationStates();
 };
 
 #endif // __HELLOWORLD_SCENE_H__
