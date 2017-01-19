@@ -28,7 +28,7 @@ bool MainMenu::init(){
 	//..................spine....
 	skeletonNode = extension::CCSkeletonAnimation::createWithFile("player.json", "player.atlas", 1.0f);
 	skeletonNode->addAnimation("runCycle", true, 0, 0);
-	skeletonNode->setPosition(ccp(visibleSize.width / 2, skeletonNode->getContentSize().height / 2));
+	skeletonNode->setPosition(ccp(visibleSize.width *0.3, skeletonNode->getContentSize().height / 2));
 	this->addChild(skeletonNode);
 	CCMenuItemImage	*pPlayItem = CCMenuItemImage::create("_bookgame_UI_play.png", "_bookgame_UI_play.png", this, menu_selector(MainMenu::playGame));
 	pPlayItem->setPosition(ccp(visibleSize.width / 2, visibleSize.height	*	0.5));
@@ -38,11 +38,15 @@ bool MainMenu::init(){
 	CCMenu *pMenu = CCMenu::create(pOptionsItem, pPlayItem, NULL);
 	pMenu->setPosition(CCPointZero);
 	this->addChild(pMenu, 10);
+	CCLabelBMFont	*nameLabel1 = CCLabelBMFont::create("HIGH SCORE : ", "PixelFont.fnt");
+	nameLabel1->setPosition(visibleSize.width *0.55, visibleSize.height	* 0.1);
+	nameLabel1->setScale(0.5);
+	this->addChild(nameLabel1);
 	CCLabelBMFont*	highScoreLabel = CCLabelBMFont::create("0","PixelFont.fnt");
-	highScoreLabel->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height * 0.1));
+	highScoreLabel->setPosition(ccp(visibleSize.width * 0.75, visibleSize.height * 0.1));
 	this->addChild(highScoreLabel, 10);
 	highScoreLabel->setScale(0.5);
-	int	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazookaGameHighScore");
+	int highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazookaGameHighScore");
 	char scoreTxt[100];
 	sprintf(scoreTxt, "%d", highScore);
 	highScoreLabel->setString(scoreTxt);

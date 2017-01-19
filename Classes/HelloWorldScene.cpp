@@ -2,7 +2,7 @@
 #include "HelloWorldScene.h"
 #include "Projectile.h"
 #include "GameplayLayer.h"
-
+#include "MainMenuScene.h"
 
 USING_NS_CC;
 
@@ -309,6 +309,13 @@ void	HelloWorld::fireRocket()
 void HelloWorld::gameover(){
 	this->unscheduleUpdate();
 	this->unschedule(schedule_selector(HelloWorld::spawnEnemy));
+	//..............home..........
+	CCMenuItemImage	*mainmenuItem = CCMenuItemImage::create("_bookgame_UI_mainmenu.png","_bookgame_UI_mainmenu.png", this, menu_selector(HelloWorld::mainMenuScene));
+	mainmenuItem->setPosition(ccp(visibleSize.width / 2, visibleSize.height	*0.2));
+	CCMenu	*mainMenu = CCMenu::create(mainmenuItem, NULL);
+	mainMenu->setPosition(CCPointZero);
+	this->addChild(mainMenu);
+
 	if (gameplayLayer->getEnemiesArray()->count() >0)
 	{
 		for (int i = 0; i< gameplayLayer->getEnemiesArray()->count(); i++)
@@ -323,12 +330,12 @@ void HelloWorld::gameover(){
 			
 		}
 	}
-	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazooka Game High Score");
+	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazookaGameHighScore");
 	if (gameplayLayer->score>highScore)
 	{
-		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazooka Game High Score", gameplayLayer->score);
+		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazookaGameHighScore", gameplayLayer->score);
 		CCUserDefault::sharedUserDefault()->flush();
-		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("NEW	HIGH SCORE",	"PixelFont.fnt");
+		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("NEW HIGH SCORE",	"PixelFont.fnt");
 			newHighScoreLabel->setPosition(ccp(visibleSize.width	*	0.5,
 			visibleSize.height	*	0.5));
 		this->addChild(newHighScoreLabel, 10);
@@ -345,7 +352,7 @@ void HelloWorld::gameover(){
 	}
 	else
 	{
-		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("BETTER LUCK	NEXT	TIME",	"PixelFont.fnt");
+		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("BETTER LUCK NEXT TIME",	"PixelFont.fnt");
 			newHighScoreLabel->setPosition(ccp(visibleSize.width	*	0.5,
 			visibleSize.height	*	0.5));
 		this->addChild(newHighScoreLabel, 10);
@@ -410,6 +417,10 @@ void HelloWorld::AnimationStates()
 		break;
 	}
 }
-
+void HelloWorld::mainMenuScene(CCObject *pSender)
+{
+	CCScene	*mScene = MainMenu::scene();
+	CCDirector::sharedDirector()->replaceScene(mScene);
+}
 
 
