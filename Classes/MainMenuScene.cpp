@@ -1,5 +1,6 @@
 #include	"MainMenuScene.h"
 #include	"HelloWorldScene.h"
+#include "OptionsMenuScene.h"
 #include	<spine/spine-cocos2dx.h>
 CCScene* MainMenu::scene()
 {
@@ -64,7 +65,8 @@ void MainMenu::playGame(CCObject *pSender)
 }
 void	MainMenu::optionsScene(CCObject*	pSender)
 {
-
+	CCScene	*mScene = OptionsMenu::scene();
+	CCDirector::sharedDirector()->replaceScene(mScene);
 }
 void	MainMenu::MoveDownFinished(CCNode*	sender)
 {
