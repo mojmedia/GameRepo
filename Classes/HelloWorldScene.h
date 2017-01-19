@@ -6,7 +6,7 @@
 #include "GameplayLayer.h"
 #include "HUDLayer.h"
 #include "ScrollingBgLayer.h"
-#include <spine/spine-cocos2dx.h>
+
 
 
 USING_NS_CC;
@@ -78,7 +78,7 @@ public:
 	void boostAnim();
 	void AnimationStates();
 	//.............spine.............
-	extension::CCSkeletonAnimation *skeletonNode;
+	
 };
 
 #endif // __HELLOWORLD_SCENE_H__

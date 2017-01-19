@@ -134,11 +134,7 @@ bool HelloWorld::init()
 	jumping = false;
 	jumpTimer = 0;	
 
-	//..................spine....
-	skeletonNode = extension::CCSkeletonAnimation::createWithFile("player.json", "player.atlas", 1.0f);
-	skeletonNode->addAnimation("runCycle", true, 0, 0);
-	skeletonNode->setPosition(ccp(visibleSize.width / 2, skeletonNode->getContentSize().height / 2));
-	this->addChild(skeletonNode);
+	
     return true;
 }
 void HelloWorld::update(float dt)
@@ -182,7 +178,7 @@ void HelloWorld::update(float dt)
 		}
 		else
 		{
-			mPlayerState = kPLayerStateIdle;
+			mPlayerState =kPLayerStateIdle;
 			jumpTimer = 0;
 			CCPoint	p = hero->getPosition();
 			CCPoint	pM = ccpAdd(p, gravity);
