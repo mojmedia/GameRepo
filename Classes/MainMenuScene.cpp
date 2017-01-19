@@ -17,7 +17,7 @@ bool MainMenu::init(){
 	CCPoint	origin = CCDirector::sharedDirector()->getVisibleOrigin();
 	scrollingBgLayer = new	ScrollingBgLayer(3.0);
 	this->addChild(scrollingBgLayer);
-	CCLabelBMFont	*nameLabel = CCLabelBMFont::create("Ms.tinyBazooka", "PixelFont.fnt");
+	CCLabelBMFont	*nameLabel = CCLabelBMFont::create("Bazooka", "PixelFont.fnt");
 	nameLabel->setPosition(visibleSize.width / 2,visibleSize.height	* 0.8);
 	this->addChild(nameLabel);
 	//actions

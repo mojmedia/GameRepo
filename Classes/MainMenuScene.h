@@ -2,6 +2,7 @@
 #define	__wp8Game__MAINMENU_SCENE__
 #include "cocos2d.h"
 #include "ScrollingBgLayer.h"
+#include <spine/spine-cocos2dx.h>
 using namespace	cocos2d;
 class MainMenu : public	cocos2d::CCLayer
 {
