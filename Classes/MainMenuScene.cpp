@@ -1,7 +1,8 @@
-#include	"MainMenuScene.h"
-#include	"HelloWorldScene.h"
+#include "MainMenuScene.h"
+#include "HelloWorldScene.h"
 #include "OptionsMenuScene.h"
-#include	<spine/spine-cocos2dx.h>
+#include "SimpleAudioEngine.h"
+#include <spine/spine-cocos2dx.h>
 CCScene* MainMenu::scene()
 {
 	CCScene *scene = CCScene::create();
@@ -60,11 +61,14 @@ void MainMenu::update(float	dt)
 }
 void MainMenu::playGame(CCObject *pSender)
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
 	CCScene	*mScene = HelloWorld::scene();
 	CCDirector::sharedDirector()->replaceScene(mScene);
+
 }
-void	MainMenu::optionsScene(CCObject*	pSender)
+void MainMenu::optionsScene(CCObject*	pSender)
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
 	CCScene	*mScene = OptionsMenu::scene();
 	CCDirector::sharedDirector()->replaceScene(mScene);
 }

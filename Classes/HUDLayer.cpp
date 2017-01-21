@@ -1,5 +1,6 @@
 #include	"HUDLayer.h"
 #include "HelloWorldScene.h"
+#include "SimpleAudioEngine.h"
 HUDLayer::HUDLayer()
 {
 	visibleSize = CCDirector::sharedDirector()->getVisibleSize();
@@ -28,21 +29,19 @@ void HUDLayer::pauseGame(CCObject *pSender)
 	HelloWorld*	helloWorld = (HelloWorld*)this->getParent();
 	if (!helloWorld->gameplayLayer->gameOver)
 	{
+		CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
 		pauseMenu->setTouchEnabled(false);
-		CCMenuItemImage*	resumeItem =
-			CCMenuItemImage::create("_bookgame_UI__resume.png",
-			"_bookgame_UI__resume.png", this,
-			menu_selector(HUDLayer::resumeGame));
-		resumeItem->setPosition(ccp(visibleSize.width	*	0.5,
-			visibleSize.height*	0.5));
+		CCMenuItemImage *resumeItem = CCMenuItemImage::create("_bookgame_UI__resume.png","_bookgame_UI__resume.png", this, menu_selector(HUDLayer::resumeGame));
+		resumeItem->setPosition(ccp(visibleSize.width * 0.5, visibleSize.height* 0.5));
 		resumeMenu = CCMenu::create(resumeItem, NULL);
 		resumeMenu->setPosition(CCPointZero);
 		this->addChild(resumeMenu);
 		helloWorld->gamePaused();
 	}
 }
-void	HUDLayer::resumeGame(CCObject*	pSender)
+void HUDLayer::resumeGame(CCObject*	pSender)
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
 	pauseMenu->setTouchEnabled(true);
 	this->removeChild(resumeMenu);
 	HelloWorld*	helloWorld = (HelloWorld*)this->getParent();

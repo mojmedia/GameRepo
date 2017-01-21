@@ -1,4 +1,5 @@
 #include "Enemy.h"
+#include "SimpleAudioEngine.h"
 Enemy::Enemy(void)
 {
 }
@@ -61,6 +62,7 @@ void	Enemy::update()
 void	Enemy::shoot(float	dt)
 {
 	//CCLog("[Enemy]	shoot");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("gunshot.wav");
 	CCPoint	p = this->getPosition();
 	p.x = p.x - this->getContentSize().width / 2;
 	p.y = p.y - this->getContentSize().height	*	0.05;

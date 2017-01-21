@@ -3,6 +3,7 @@
 #include "Projectile.h"
 #include "GameplayLayer.h"
 #include "MainMenuScene.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
 
@@ -142,7 +143,6 @@ void HelloWorld::update(float dt)
 	if (!gameplayLayer->gameOver)
 	{
 		this->AnimationStates();
-
 		//enemy->update();
 		gameplayLayer->update();
 		//.......scroling
@@ -299,6 +299,7 @@ void HelloWorld::buttonControltop(CCObject *pSender)
 //....................fire rocket..........
 void	HelloWorld::fireRocket()
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("fireRocket.wav");
 	CCPoint	p = hero->getPosition();
 	p.x = p.x + hero->getContentSize().width / 2;
 	p.y = p.y - hero->getContentSize().height	*	0.05;
@@ -333,6 +334,7 @@ void HelloWorld::gameover(){
 	highScore = CCUserDefault::sharedUserDefault()->getIntegerForKey("bazookaGameHighScore");
 	if (gameplayLayer->score>highScore)
 	{
+		
 		CCUserDefault::sharedUserDefault()->setIntegerForKey("bazookaGameHighScore", gameplayLayer->score);
 		CCUserDefault::sharedUserDefault()->flush();
 		CCLabelBMFont*	newHighScoreLabel = CCLabelBMFont::create("NEW HIGH SCORE",	"PixelFont.fnt");
@@ -419,6 +421,7 @@ void HelloWorld::AnimationStates()
 }
 void HelloWorld::mainMenuScene(CCObject *pSender)
 {
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
 	CCScene	*mScene = MainMenu::scene();
 	CCDirector::sharedDirector()->replaceScene(mScene);
 }
