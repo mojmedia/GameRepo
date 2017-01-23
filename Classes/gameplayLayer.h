@@ -22,6 +22,7 @@ public:
 	
 	CCArray* enemyBullets;
 	CCArray* enemyBulletsToBeDeleted;
+	CCArray* playerBulletToBeDeleted;
 	CCSprite* hero;
 	int score;
 	bool gameOver;

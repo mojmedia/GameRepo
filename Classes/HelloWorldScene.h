@@ -7,7 +7,7 @@
 #include "HUDLayer.h"
 #include "ScrollingBgLayer.h"
 #include <spine/spine-cocos2dx.h>
-
+ 
 using namespace cocos2d;
 
 class HelloWorld : public cocos2d::CCLayer
@@ -21,7 +21,8 @@ public:
 	CCLabelBMFont* scoreLabel;
 	HUDLayer* hudLayer;
 	ScrollingBgLayer* scrollingBgLayer;
-	extension::CCSkeletonAnimation* skeletonNode; 
+	
+	CCParticleSystemQuad* flameParticle;
 
 	virtual bool init();
 
@@ -29,7 +30,7 @@ public:
 	void gameResumed();
 	// there's no 'id' in cpp, so we recommend returning the class instance pointer
 	static cocos2d::CCScene* scene();
-
+	void mainMenuScene(CCObject* pSender);
 	void update(float dt);
 	void spawnEnemy(float dt);
 	void fireRocket();

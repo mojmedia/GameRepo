@@ -1,5 +1,7 @@
 ﻿#include "HelloWorldScene.h"
 #include "gameplayLayer.h"
+#include "ParticleLayer.h"
+#include "MainMenuScene.h"
 
 USING_NS_CC;
 
@@ -37,13 +39,26 @@ bool HelloWorld::init()
 	scrollingBgLayer = new ScrollingBgLayer(3.0);
 	this->addChild(scrollingBgLayer);
 
-	hudLayer = new HUDLayer();
-	this->addChild(hudLayer, 15); //keeping at top most layer
-
+	
 	//--------------------------------------------------Hero-------
 	HelloWorld::hero = CCSprite::create("bookGame_tinyBazooka.png");
 	HelloWorld::hero->setPosition(ccp(visibleSize.width * 0.25, visibleSize.height * 0.5));
 	this->addChild(HelloWorld::hero, 0);
+
+	//----------------------------HUD Display--------------
+	hudLayer = new HUDLayer();
+	this->addChild(hudLayer, 15); //keeping at top most layer
+
+
+
+	//----------------------------particle player moves upwards
+	flameParticle = CCParticleSystemQuad::create("jetBoost.plist");
+	flameParticle->setPosition(ccpAdd(hero->getPosition(), ccp(-hero->getContentSize().width * 0.25, 0)));
+	this->addChild(flameParticle);
+
+	
+
+	// -------------------------انیمیشن-------
 	//کار با انیمیشن به سبک spritesheet میباشد
 	CCSpriteBatchNode* spritebatch = CCSpriteBatchNode::create("player_anim.png");
 	CCSpriteFrameCache* cache = CCSpriteFrameCache::sharedSpriteFrameCache();
@@ -77,11 +92,7 @@ bool HelloWorld::init()
 	mBoostAction = CCRepeatForever::create(CCAnimate::create(boostanimation));
 	mBoostAction->retain();
 
-	//----------------------------skeleton animation------------------------
-	skeletonNode = extension::CCSkeletonAnimation::createWithFile("player.json", "player.atlas", 1.0f);
-	skeletonNode->addAnimation("runCycle", true, 0, 0);
-	skeletonNode->setPosition(ccp(visibleSize.width / 2, skeletonNode->getContentSize().height / 2));
-	addChild(skeletonNode);
+	
 	//---------------------------------------------GameplayLayer------------
 	gameplayLayer = new GameplayLayer(hero);
 	this->addChild(gameplayLayer);
@@ -93,9 +104,9 @@ bool HelloWorld::init()
 	this->setTouchEnabled(true);
 	this->setAccelerometerEnabled(true);
 	this->scheduleUpdate();
-	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 1.0);
+	this->schedule(schedule_selector(HelloWorld::spawnEnemy), 2.5);
 	return true;
-	
+
 
 }//HelloWorld::init()
 
@@ -108,9 +119,11 @@ void HelloWorld::update(float dt)
 		scrollingBgLayer->update();
 		CCSize visiblesize = CCDirector::sharedDirector()->getVisibleSize();
 		CCPoint origin = CCDirector::sharedDirector()->getVisibleOrigin();
-		gameplayLayer->update();
+		gameplayLayer->update();//Gameplay
 
-		hudLayer->updateScore(gameplayLayer->score);
+		hudLayer->updateScore(gameplayLayer->score); // HUD
+
+		flameParticle->setPosition(ccpAdd(hero->getPosition(), ccp(-hero->getContentSize().width * 0.25, 0)));//particle
 
 		//CCLog("updating");
 		CCPoint p = HelloWorld::hero->getPosition();
@@ -167,6 +180,7 @@ void HelloWorld::spawnEnemy(float dt)
 		Enemy* e = Enemy::createEnemy(gameplayLayer);
 		gameplayLayer->addChild(e);
 		gameplayLayer->getEnemiesArray()->addObject(e);
+
 	}
 }
 
@@ -241,6 +255,31 @@ void HelloWorld::fireRocket()
 	Projectile* rocket = Projectile::createProjectile(p, 2);
 	gameplayLayer->addChild(rocket);
 	gameplayLayer->getPlayerBulletsArray()->addObject(rocket);
+	//---------------افزودن پارتیکل انفجار ----------
+	CCParticleSystemQuad* m_emitter = new CCParticleSystemQuad();
+	m_emitter = CCParticleExplosion::create();
+	m_emitter->setPosition(ccpAdd(hero->getPosition(),
+		ccp(hero->getContentSize().width / 2, 0)));//از نقطه ی هیرو به اندازه نصف عرض هیرو جلوتر
+	m_emitter->setStartColor(ccc4f(2.0, 0.5, 0.0, 1.0));
+	m_emitter->setEndColor(ccc4f(0.0, 0.0, 0.0, 0.0));
+	m_emitter->setTotalParticles(10);
+	m_emitter->setLife(0.25);
+	m_emitter->setSpeed(2.0);
+	m_emitter->setSpeedVar(30.0);
+
+	//جاذبه
+	m_emitter->setEmitterMode(kCCParticleModeGravity);
+	m_emitter->setGravity(ccp(-80, 90));
+
+	//** mode radius
+	//m_emitter->setEmitterMode(kCCParticleModeRadius);
+	//m_emitter->setStartRadius(0);
+	//m_emitter->setStartRadiusVar(50);
+	//m_emitter->setRotatePerSecond(2);
+	//m_emitter->setRotatePerSecondVar(5);
+
+	this->addChild(m_emitter);
+
 }
 
 void HelloWorld::GameOver()
@@ -301,6 +340,21 @@ void HelloWorld::GameOver()
 		this->addChild(newHighScoreLabel, 10);
 		newHighScoreLabel->setScale(0.75);
 	}
+	CCMenuItemImage *mainmenuItem =
+		CCMenuItemImage::create("_bookgame_UI_mainmenu.png",
+		"_bookgame_UI_mainmenu.png", this,
+		menu_selector(HelloWorld::mainMenuScene));
+	mainmenuItem->setPosition(ccp(visibleSize.width / 2, visibleSize.height *
+		0.2));
+	CCMenu *mainMenu = CCMenu::create(mainmenuItem, NULL);
+	mainMenu->setPosition(CCPointZero);
+	this->addChild(mainMenu);
+}
+
+void HelloWorld::mainMenuScene(CCObject* pSender)
+{
+	CCScene *mScene = MainMenu::scene();
+	CCDirector::sharedDirector()->replaceScene(mScene);
 }
 
 void HelloWorld::gamePaused()

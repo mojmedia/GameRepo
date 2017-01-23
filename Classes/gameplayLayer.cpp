@@ -1,5 +1,6 @@
 #include "gameplayLayer.h"
 #include "Enemy.h"
+#include "ParticleLayer.h"
 
 GameplayLayer::GameplayLayer(CCSprite* hero)
 {
@@ -10,9 +11,20 @@ GameplayLayer::GameplayLayer(CCSprite* hero)
 	enemyBullets = new CCArray();
 	enemyBulletsToBeDeleted = new CCArray();
 	playerBullets = new CCArray();
+	playerBulletToBeDeleted = new CCArray();
 	score = 0;
 	gameOver = false;
 
+	//----------------------------اضافه کردن پارتیکل --------
+	CCParticleSystemQuad * smokeParticle = CCParticleSystemQuad::create("smoke.plist");
+	smokeParticle->setPosition(hero->getPosition());
+	this->addChild(smokeParticle);
+	smokeParticle->setAutoRemoveOnFinish(true);
+
+	CCParticleSystemQuad * dustParticle = CCParticleSystemQuad::create("dusts.plist");
+	dustParticle->setPosition(hero->getPosition());
+	this->addChild(dustParticle);
+	dustParticle->setAutoRemoveOnFinish(true);
 }
 
 GameplayLayer::~GameplayLayer()
@@ -34,6 +46,7 @@ void GameplayLayer::update()
 			e->update();
 			if (e->getPositionX() < 0)
 			{
+				
 				//gameOver = true;
 				enemieasToBeDeleted->addObject(e);
 			}
@@ -45,7 +58,9 @@ void GameplayLayer::update()
 		Enemy *target = (Enemy*)(ee);
 		enemies->removeObject(target);
 		enemieasToBeDeleted->removeObject(target);
+
 		this->removeChild(target, true);
+		
 	}
 	//-----------------------enemyBullet---------------------
 	if (enemyBullets != NULL && enemyBullets->count() > 0)
@@ -77,10 +92,18 @@ void GameplayLayer::update()
 			p->update();
 			if (p->getPositionX() >= visibleSize.width)
 			{
-				this->removeChild(p);
-				playerBullets->removeObject(p);
+				playerBulletToBeDeleted->addObject(p);
+				 
 			}
 		}
+	}
+	CCObject* eeeb;
+	CCARRAY_FOREACH(playerBulletToBeDeleted , eeeb)
+	{
+		Projectile* target = (Projectile*)eeeb;
+		playerBullets->removeObject(target);
+		playerBulletToBeDeleted->removeObject(target);
+		this->removeChild(target, true);
 	}
 	//-----------------------player rocket and enemies collision---------------
 	if (playerBullets->count() >= 0)
@@ -98,8 +121,10 @@ void GameplayLayer::update()
 						score++;
 						this->removeChild(p);
 						playerBullets->removeObject(p);
-						enemyBulletsToBeDeleted->addObject(en);
-						this->removeChild(en);
+						enemieasToBeDeleted->addObject(en);
+						//پارتیکل کشته  شدن دشمن
+						ParticleLayer* pLayer = new ParticleLayer(en->getPosition());
+						this->addChild(pLayer);
 						return;
 					}
 				}
