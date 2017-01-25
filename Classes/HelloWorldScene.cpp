@@ -2,7 +2,7 @@
 #include "gameplayLayer.h"
 #include "ParticleLayer.h"
 #include "MainMenuScene.h"
-
+#include "SimpleAudioEngine.h"
 USING_NS_CC;
 
 CCScene* HelloWorld::scene()
@@ -248,6 +248,10 @@ void HelloWorld::didAccelerate(CCAcceleration* pAccelerationValue)
 
 void HelloWorld::fireRocket()
 {
+	//audio effect
+	CocosDenshion::SimpleAudioEngine::sharedEngine() ->playEffect("fireRocket.wav");
+	//------------------------------
+	
 	CCPoint p = hero->getPosition();
 
 	p.x = p.x + hero->getContentSize().width / 2;

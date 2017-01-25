@@ -1,6 +1,7 @@
 #include "gameplayLayer.h"
 #include "Enemy.h"
 #include "ParticleLayer.h"
+#include "SimpleAudioEngine.h"
 
 GameplayLayer::GameplayLayer(CCSprite* hero)
 {
@@ -46,7 +47,7 @@ void GameplayLayer::update()
 			e->update();
 			if (e->getPositionX() < 0)
 			{
-				
+
 				//gameOver = true;
 				enemieasToBeDeleted->addObject(e);
 			}
@@ -60,7 +61,7 @@ void GameplayLayer::update()
 		enemieasToBeDeleted->removeObject(target);
 
 		this->removeChild(target, true);
-		
+
 	}
 	//-----------------------enemyBullet---------------------
 	if (enemyBullets != NULL && enemyBullets->count() > 0)
@@ -93,12 +94,12 @@ void GameplayLayer::update()
 			if (p->getPositionX() >= visibleSize.width)
 			{
 				playerBulletToBeDeleted->addObject(p);
-				 
+
 			}
 		}
 	}
 	CCObject* eeeb;
-	CCARRAY_FOREACH(playerBulletToBeDeleted , eeeb)
+	CCARRAY_FOREACH(playerBulletToBeDeleted, eeeb)
 	{
 		Projectile* target = (Projectile*)eeeb;
 		playerBullets->removeObject(target);
@@ -115,9 +116,12 @@ void GameplayLayer::update()
 			{
 				for (int j = 0; j < enemies->count(); j++)
 				{
+
 					Enemy* en = (Enemy*)enemies->objectAtIndex(j);
 					if (checkBoxCollision(p, en))
 					{
+						CocosDenshion::SimpleAudioEngine::sharedEngine() -> playEffect("enemyKill.wav");
+						CocosDenshion::SimpleAudioEngine::sharedEngine() -> playEffect("rocketExplode.wav");
 						score++;
 						this->removeChild(p);
 						playerBullets->removeObject(p);
@@ -140,6 +144,7 @@ void GameplayLayer::update()
 			Projectile* pr = (Projectile*)enemyBullets->objectAtIndex(i);
 			if (checkBoxCollision(pr, hero))
 			{
+				CocosDenshion::SimpleAudioEngine::sharedEngine() ->playEffect("playerKill.wav");
 				enemyBulletsToBeDeleted->addObject(pr);
 				gameOver = true;
 			}

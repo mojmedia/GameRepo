@@ -12,6 +12,11 @@ public:
 	void update(float dt);
 	void reset(CCObject* pSender);
 	void mainMenu(CCObject* pSender);
+	//------sound------
+	CCMenuItemImage* soundOnItem;
+	CCMenuItemImage* soundOffItem;
+	void SoundOnOff(CCObject* sender);
+
 	CREATE_FUNC(OptionsMenu);
 };
 #endif

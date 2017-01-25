@@ -1,4 +1,5 @@
 ﻿#include "Enemy.h"
+#include "SimpleAudioEngine.h"
 
 
 Enemy::Enemy()
@@ -71,6 +72,6 @@ void Enemy::shoot(float dt)
 	Projectile* pr = Projectile::createProjectile(p, 1);
 	gameplayLayer->addChild(pr);
 	gameplayLayer->getEnemyBulletsArray()->addObject(pr);
-
+	CocosDenshion::SimpleAudioEngine::sharedEngine() ->playEffect("gunshot.wav");
 }
 

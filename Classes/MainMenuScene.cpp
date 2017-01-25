@@ -15,7 +15,7 @@ bool MainMenu::init(){
 	{
 		return false;
 	}
-	//soundbutton
+	//دکمه صدا
 	bool isPaused = CCUserDefault::sharedUserDefault()->getBoolForKey("tinyBazooka_kSoundPausedKey");
 	if (isPaused == true)
 	{
@@ -25,6 +25,7 @@ bool MainMenu::init(){
 	{
 		CocosDenshion::SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
 	}
+	//-----------------------------------------------------
 	CCSize	visibleSize = CCDirector::sharedDirector()->getVisibleSize();
 	CCPoint	origin = CCDirector::sharedDirector()->getVisibleOrigin();
 	scrollingBgLayer = new	ScrollingBgLayer(3.0);

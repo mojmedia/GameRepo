@@ -1,5 +1,6 @@
 #include "HUDLayer.h"
 #include "HelloWorldScene.h"
+#include "SimpleAudioEngine.h"
 
 HUDLayer::HUDLayer()
 {
@@ -21,6 +22,10 @@ HUDLayer::HUDLayer()
 
 void HUDLayer::pauseGame(CCObject* pSender)
 {
+	//audio-------------
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
+	//-------------------
 	HelloWorld* helloWorld = (HelloWorld*)this->getParent();
 	if (!helloWorld->gameplayLayer->gameOver)
 	{
@@ -40,6 +45,11 @@ void HUDLayer::pauseGame(CCObject* pSender)
 
 void HUDLayer::resumeGame(CCObject* pSender)
 {
+	//audio
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->playEffect("pop.wav");
+	CocosDenshion::SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();
+	//--------------
+
 	pauseMenu->setTouchEnabled(true);
 	this->removeChild(resumeMenu);
 	HelloWorld* helloWorld = (HelloWorld*)this->getParent();
